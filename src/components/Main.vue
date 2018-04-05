@@ -1,11 +1,13 @@
 <script>
 import WeaponInput from '@/components/WeaponInput'
+import Calculator from '@/components/Calculator'
 
 export default {
   name: 'Main',
 
   components: {
     WeaponInput,
+    Calculator,
   },
 
   data() {
@@ -16,6 +18,7 @@ export default {
         sharpness: 'Green'
       },
       skills: [],
+      affinityMultiplier: 0.25,
     }
   }
 }
@@ -26,5 +29,11 @@ export default {
     <h1>MHW Damage Calculator</h1>
 
     <weapon-input :weapon='weapon' />
+
+    <calculator
+      :weapon='weapon'
+      :skills='skills'
+      :affinityMultiplier='affinityMultiplier'
+    />
   </div>
 </template>

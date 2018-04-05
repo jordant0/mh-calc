@@ -17,7 +17,7 @@ export default {
 
     <div>
       <label>Affinity:</label>
-      <input type='text' v-model='weapon.affinity' />
+      <input type='text' v-model='weapon.affinity' />%
     </div>
 
     <div>
@@ -27,6 +27,7 @@ export default {
         <option>Blue</option>
         <option>Green</option>
         <option>Yellow</option>
+        <option>Orange</option>
         <option>Red</option>
       </select>
     </div>
