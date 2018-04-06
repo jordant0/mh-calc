@@ -18,8 +18,8 @@ export default {
         this.weapon.affinity = 100;
       }
 
-      if(this.weapon.affinity < 0) {
-        this.weapon.affinity = 0;
+      if(this.weapon.affinity < -100) {
+        this.weapon.affinity = -100;
       }
     },
   },
@@ -36,7 +36,7 @@ export default {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.0.4',
+        version: '0.0.5',
       }
     }
   }
