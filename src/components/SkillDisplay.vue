@@ -20,7 +20,11 @@ export default {
 
     updateSkillActivation(skillId, updateSkillActivation) {
       this.$emit('skill-level-activation', skillId, updateSkillActivation);
-    }
+    },
+
+    removeSkill(skillId) {
+      this.$emit('skill-remove', skillId);
+    },
   }
 }
 </script>
@@ -33,6 +37,15 @@ export default {
       :skill='skill'
       @skill-level-update='updateSkillLevel'
       @skill-level-activation='updateSkillActivation'
+      @skill-remove='removeSkill'
     />
   </div>
 </template>
+
+<style>
+.skills-display {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+}
+</style>

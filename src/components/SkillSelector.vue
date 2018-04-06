@@ -32,16 +32,12 @@ export default {
 
     return {
       skillList: listOfSkills,
-      selectedSkill: '',
     }
   },
 
   methods: {
     skillSelected(option) {
       this.$emit('skill-added', option.value);
-      var skillIndex = this.skillList.findIndex(function(skill) {
-        return skill.value === option.value;
-      });
     },
   },
 }
@@ -49,14 +45,29 @@ export default {
 
 <template>
   <div class='skill-selector'>
-    <div>
-      Select skills
+    <div class='skills-input input-item'>
+      <span class='input-label'>
+        Select skills
+      </span>
+
+      <vue-select
+        placeholder='Type to search...'
+        :clear-search-on-select='true'
+        :options='skillList'
+        :on-change='skillSelected'
+      />
     </div>
-    <vue-select
-      placeholder='Select skills...'
-      :clear-search-on-select='true'
-      :options='skillList'
-      :on-change='skillSelected'
-    />
   </div>
 </template>
+
+<style>
+.v-select .dropdown-toggle {
+  border-color: white;
+  background-color: white;
+  width: 400px;
+}
+
+.skills-input {
+  width: 580px;
+}
+</style>

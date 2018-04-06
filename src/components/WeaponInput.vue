@@ -10,19 +10,25 @@ export default {
 
 <template>
   <form class='weapon-input'>
-    <div>
-      <label>Raw:</label>
-      <input type='text' v-model='weapon.raw' />
+    <div class='input-item'>
+      <span class='input-label'>Raw</span>
+      <input class='input-field' type='number' v-model.number='weapon.raw' />
     </div>
 
-    <div>
-      <label>Affinity:</label>
-      <input type='text' v-model='weapon.affinity' />%
+    <div class='input-item'>
+      <span class='input-label'>Affinity</span>
+      <div>
+        <input
+          class='affinity-input input-field'
+          type='number'
+          v-model.number='weapon.affinity'
+        />%
+      </div>
     </div>
 
-    <div>
-      <label>Sharpness:</label>
-      <select v-model='weapon.sharpness'>
+    <div class='input-item'>
+      <span class='input-label'>Sharpness</span>
+      <select class='input-field' v-model='weapon.sharpness'>
         <option>White</option>
         <option>Blue</option>
         <option>Green</option>
@@ -33,3 +39,10 @@ export default {
     </div>
   </form>
 </template>
+
+<style>
+.affinity-input {
+  margin-right: 5px;
+  width: 62px;
+}
+</style>

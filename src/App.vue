@@ -11,12 +11,19 @@ export default {
 </template>
 
 <style>
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: #1d2120;
+  overflow: hidden;
+}
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #dfeae9;
 }
 </style>

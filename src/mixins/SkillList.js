@@ -34,5 +34,40 @@ export const SkillList = {
         affinityModifier: .30,
       },
     ]
-  }
+  },
+  3: {
+    name: 'Attack Boost',
+    defaultActiviation: 100,
+    fixedActivation: true,
+    levels: [
+      {
+        rawModifier: 3,
+        affinityModifier: 0,
+      },
+      {
+        rawModifier: 6,
+        affinityModifier: 0,
+      },
+      {
+        rawModifier: 9,
+        affinityModifier: 0,
+      },
+      {
+        rawModifier: 12,
+        affinityModifier: 0.05,
+      },
+      {
+        rawModifier: 15,
+        affinityModifier: 0.05,
+      },
+      {
+        rawModifier: 18,
+        affinityModifier: 0.05,
+      },
+      {
+        rawModifier: 21,
+        affinityModifier: 0.05,
+      },
+    ]
+  },
 }

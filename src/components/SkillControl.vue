@@ -39,7 +39,7 @@ export default {
     updateSkillLevel(skillId, skillLevel) {
       var skillIndex = this.findSkillIndex(skillId);
 
-      if(this.skills[skillIndex].level !== skillLevel) {
+      if(skillIndex >= 0 && this.skills[skillIndex].level !== skillLevel) {
         var newSkills = this.skills;
         newSkills[skillIndex].level = skillLevel;
         this.$emit('update:skills', newSkills);
@@ -49,24 +49,43 @@ export default {
     updateSkillActivation(skillId, skillActivation) {
       var skillIndex = this.findSkillIndex(skillId);
 
-      if(this.skills[skillIndex].activation !== skillActivation) {
+      if(skillActivation > 100) {
+        skillActivation = 100;
+      }
+
+      if(skillActivation < 0) {
+        skillActivation = 0;
+      }
+
+      if(skillIndex >= 0 && this.skills[skillIndex].activation !== skillActivation) {
         var newSkills = this.skills;
         newSkills[skillIndex].activation = skillActivation;
         this.$emit('update:skills', newSkills);
       }
-    }
+    },
+
+    removeSkill(skillId) {
+      var skillIndex = this.findSkillIndex(skillId);
+
+      if(skillIndex >= 0) {
+        var newSkills = this.skills;
+        newSkills.splice(skillIndex, 1);
+        this.$emit('update:skills', newSkills);
+      }
+    },
   }
 }
 </script>
 
 <template>
-  <div class='skill-controls'>
+  <div class='skill-controls bordered-box'>
     <skill-selector @skill-added='addSkill' />
 
     <skill-display
-      :skills='skills'
+      :skills.sync='skills'
       @skill-level-update='updateSkillLevel'
       @skill-level-activation='updateSkillActivation'
+      @skill-remove='removeSkill'
     />
   </div>
 </template>
