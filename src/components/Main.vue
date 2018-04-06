@@ -1,6 +1,7 @@
 <script>
 import WeaponInput from '@/components/WeaponInput'
 import Calculator from '@/components/Calculator'
+import SkillControl from '@/components/SkillControl'
 
 export default {
   name: 'Main',
@@ -8,6 +9,7 @@ export default {
   components: {
     WeaponInput,
     Calculator,
+    SkillControl,
   },
 
   data() {
@@ -19,6 +21,9 @@ export default {
       },
       skills: [],
       affinityMultiplier: 0.25,
+      settings: {
+        debug: false,
+      }
     }
   }
 }
@@ -30,10 +35,13 @@ export default {
 
     <weapon-input :weapon='weapon' />
 
+    <skill-control :skills.sync='skills' />
+
     <calculator
       :weapon='weapon'
       :skills='skills'
       :affinityMultiplier='affinityMultiplier'
+      :settings='settings'
     />
   </div>
 </template>
