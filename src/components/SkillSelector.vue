@@ -62,8 +62,8 @@ export default {
 
 <style>
 .v-select .dropdown-toggle {
-  border-color: white;
-  background-color: white;
+  border-color: white !important;
+  background-color: white !important;
   width: 400px;
 }
 
