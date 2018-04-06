@@ -80,11 +80,23 @@ export default {
   <div class='skill-controls bordered-box'>
     <skill-selector @skill-added='addSkill' />
 
-    <skill-display
-      :skills.sync='skills'
-      @skill-level-update='updateSkillLevel'
-      @skill-level-activation='updateSkillActivation'
-      @skill-remove='removeSkill'
-    />
+    <div class='skills-display'>
+      <skill-display
+        v-for='skill in skills'
+        :key='skill.id'
+        :skill='skill'
+        @skill-level-update='updateSkillLevel'
+        @skill-level-activation='updateSkillActivation'
+        @skill-remove='removeSkill'
+      />
+    </div>
   </div>
 </template>
+
+<style>
+.skills-display {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+}
+</style>

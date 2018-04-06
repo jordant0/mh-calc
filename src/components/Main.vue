@@ -2,18 +2,27 @@
 import WeaponInput from '@/components/WeaponInput'
 import Calculator from '@/components/Calculator'
 import SkillControl from '@/components/SkillControl'
+import SaveManager from '@/components/SaveManager'
+import JsonProcessor from '@/mixins/JsonProcessor'
+
+const LOCAL_STORAGE_KEY = 'MhCalc-SavedData';
 
 export default {
   name: 'Main',
+
+  mixins: [
+    JsonProcessor
+  ],
 
   components: {
     WeaponInput,
     Calculator,
     SkillControl,
+    SaveManager,
   },
 
   watch: {
-    'weapon.affinity': function (val) {
+    'weapon.affinity': function() {
       if(this.weapon.affinity > 100) {
         this.weapon.affinity = 100;
       }
@@ -21,6 +30,10 @@ export default {
       if(this.weapon.affinity < -100) {
         this.weapon.affinity = -100;
       }
+    },
+
+    saves: function() {
+      this.saveToLocalStorage(LOCAL_STORAGE_KEY, this.saves);
     },
   },
 
@@ -32,13 +45,21 @@ export default {
         sharpness: 'Green'
       },
       skills: [],
+      finalRaw: 0,
+      saves: this.loadFromLocalStorage(LOCAL_STORAGE_KEY, []),
       settings: {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.0.6',
-      }
+        version: '0.1.0',
+      },
     }
+  },
+
+  methods: {
+    updatedFinalRaw(value) {
+      this.finalRaw = value;
+    },
   }
 }
 </script>
@@ -53,19 +74,33 @@ export default {
     </h1>
 
     <div class='main-content'>
-      <div class='weapon-col bordered-box'>
-        <weapon-input :weapon='weapon' />
-      </div>
-
-      <calculator
-        :weapon='weapon'
-        :skills='skills'
+      <save-manager
+        :weapon.sync='weapon'
+        :skills.sync='skills'
         :settings='settings'
+        :final-raw='finalRaw'
+        :saves.sync='saves'
       />
-    </div>
 
-    <div class='skills-col'>
-      <skill-control :skills.sync='skills' />
+      <div class='current-data'>
+        <div class='general-data'>
+          <div class='weapon-col bordered-box'>
+            <weapon-input :weapon='weapon' />
+          </div>
+
+          <calculator
+            :weapon='weapon'
+            :skills='skills'
+            :settings='settings'
+            :final-raw='finalRaw'
+            @updated-final-raw='updatedFinalRaw'
+          />
+        </div>
+
+        <div class='skills-col'>
+          <skill-control :skills.sync='skills' />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -87,7 +122,7 @@ h1 {
   margin-top: 10px;
 }
 
-.main-content {
+.general-data {
   display: flex;
   justify-content: space-between;
   margin-top: 40px;
@@ -99,6 +134,15 @@ h1 {
   border-radius: 5px;
   padding: 24px 32px;
   margin: 0 20px;
+}
+
+.dashed-border {
+  border: 1px dashed #b9b9b5;
+  border-radius: 2px;
+}
+
+.current-data {
+  width: 70%;
 }
 
 .input-item {
@@ -127,5 +171,30 @@ a {
 
 a:hover {
   color: #efefef;
+}
+
+.button {
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 3px;
+  color: black;
+  border: 1px solid #b5b5b5;
+}
+
+.button:hover {
+  background-color: #cccccc;
+  color: black;
+}
+
+.remove-link {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  border: 1px solid #bbbbbb;
+  border-radius: 50%;
 }
 </style>

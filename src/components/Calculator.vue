@@ -1,5 +1,6 @@
 <script>
 import FindSkill from '@/mixins/FindSkill'
+import RoundToDecimal from '@/mixins/RoundToDecimal'
 import { SkillList } from '@/data/SkillList'
 
 export default {
@@ -7,11 +8,13 @@ export default {
 
   mixins: [
     FindSkill,
+    RoundToDecimal,
   ],
 
   props: {
     weapon: Object,
     skills: Array,
+    finalRaw: Number,
     settings: {
       type: Object,
       default: {}
@@ -113,13 +116,16 @@ export default {
     },
 
     finalAverageRaw() {
-      var variablesCount = this.variableSkills.length;
+      var finalResult = 0,
+          variablesCount = this.variableSkills.length;
 
       if(variablesCount < 1) {
-        return this.averageRaw(this.fixedRawAndAffinity.raw, this.fixedRawAndAffinity.affinity);
+        finalResult = this.averageRaw(this.fixedRawAndAffinity.raw, this.fixedRawAndAffinity.affinity);
       }
       else {
-        console.log(`[ Calculating variable raw and affinity | Fixed Raw: ${this.fixedRawAndAffinity.raw} | Fixed Affinity: ${this.fixedRawAndAffinity.affinity} ]`);
+        if(this.settings.debug && this.settings.verbose) {
+          console.log(`[ Calculating variable raw and affinity | Fixed Raw: ${this.fixedRawAndAffinity.raw} | Fixed Affinity: ${this.fixedRawAndAffinity.affinity} ]`);
+        }
 
         var permutations = 2 ** variablesCount,
             totalAverageRaw = 0;
@@ -136,8 +142,14 @@ export default {
             totalAverageRaw += this.averageRaw(configResults.raw, configResults.affinity) * configResults.chance;
           }
         }
-        return totalAverageRaw;
+        finalResult = totalAverageRaw;
       }
+
+      if(finalResult !== this.finalRaw) {
+        this.$emit('updated-final-raw', finalResult);
+      }
+
+      return finalResult;
     },
 
     displayFixeRaw() {
@@ -214,12 +226,6 @@ export default {
       }
 
       return { raw, affinity };
-    },
-
-    roundToDecimal(num) {
-      var factor = Math.pow(10, this.settings.precision || 2);
-
-      return Math.round(num * factor) / factor;
     },
   },
 }
