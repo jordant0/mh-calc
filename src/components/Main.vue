@@ -32,12 +32,11 @@ export default {
         sharpness: 'Green'
       },
       skills: [],
-      affinityMultiplier: 0.25,
       settings: {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.0.3',
+        version: '0.0.4',
       }
     }
   }
@@ -61,7 +60,6 @@ export default {
       <calculator
         :weapon='weapon'
         :skills='skills'
-        :affinityMultiplier='affinityMultiplier'
         :settings='settings'
       />
     </div>

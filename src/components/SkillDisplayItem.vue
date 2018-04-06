@@ -1,5 +1,5 @@
 <script>
-import { SkillList } from '@/mixins/SkillList'
+import { SkillList } from '@/data/SkillList'
 
 export default {
   name: 'SkillDisplayItem',

@@ -1,5 +1,5 @@
 <script>
-import { SkillList } from '@/mixins/SkillList'
+import { SkillList } from '@/data/SkillList'
 
 export default {
   name: 'Calculator',
@@ -7,7 +7,6 @@ export default {
   props: {
     weapon: Object,
     skills: Array,
-    affinityMultiplier: Number,
     settings: {
       type: Object,
       default: {}
@@ -38,15 +37,26 @@ export default {
       return this.weapon.affinity / 100;
     },
 
+    affinityMultiplier() {
+      var skillIndex = this.findSkillIndex(0); // Critical Boost
+
+      if(skillIndex > 0) {
+        return 0.25 + this.skills[skillIndex].level * 0.05;
+      }
+      else {
+        return 0.25;
+      }
+    },
+
     fixedSkills() {
       return this.skills.filter(function(skill) {
-        return skill.activation >= 100;
+        return skill.id !== 0 && skill.activation >= 100;
       });
     },
 
     variableSkills() {
       return this.skills.filter(function(skill) {
-        return skill.activation < 100 && skill.activation > 0;
+        return skill.id !== 0 && skill.activation < 100 && skill.activation > 0;
       });
     },
 
@@ -110,6 +120,12 @@ export default {
   },
 
   methods: {
+    findSkillIndex(skillId) {
+      return this.skills.findIndex(function(skill) {
+        return skill.id === skillId;
+      });
+    },
+
     convertToDecimal(num, size) {
       var binary = (num >>> 0).toString(2),
           padding = '0'.repeat(size - binary.length);
@@ -162,8 +178,8 @@ export default {
 
     getRawAndAffinityForSkill(skill) {
       var skillData = SkillList[skill.id],
-          raw = skillData.levels[skill.level - 1].rawModifier,
-          affinity = skillData.levels[skill.level - 1].affinityModifier;
+          raw = skillData.levels[skill.level - 1].rawModifier || 0,
+          affinity = skillData.levels[skill.level - 1].affinityModifier || 0;
 
       if(this.settings.debug && this.settings.verbose) {
         console.log(`Checking data for skill "${skillData.name}" lv ${skill.level} | Raw: ${raw} | Affinity: ${affinity}`);
@@ -183,14 +199,19 @@ export default {
 
 <template>
   <div class='damage-display bordered-box'>
-    <div class='damage-item damage-fixed'>
+    <div class='damage-item damage-detail'>
       <span class='damage-label'>Fixed raw:</span>
       <span class='damage-number'>{{ this.fixedRawAndAffinity.raw }}</span>
     </div>
 
-    <div class='damage-item damage-fixed'>
+    <div class='damage-item damage-detail'>
       <span class='damage-label'>Fixed affinity:</span>
       <span class='damage-number'>{{ displayFixedAffinity }}%</span>
+    </div>
+
+    <div class='damage-item damage-detail'>
+      <span class='damage-label'>Affinity multiplier:</span>
+      <span class='damage-number'>{{ affinityMultiplier }}%</span>
     </div>
 
     <div class='damage-item damage-final'>
@@ -213,7 +234,7 @@ export default {
   margin-bottom: 12px;
 }
 
-.damage-fixed {
+.damage-detail {
   color: #777777;
 }
 

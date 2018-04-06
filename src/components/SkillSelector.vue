@@ -1,6 +1,6 @@
 <script>
 import VueSelect from 'vue-select'
-import { SkillList } from '@/mixins/SkillList'
+import { SkillList } from '@/data/SkillList'
 
 export default {
   name: 'SkillSelector',
