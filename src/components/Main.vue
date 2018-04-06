@@ -36,7 +36,7 @@ export default {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.0.5',
+        version: '0.0.6',
       }
     }
   }

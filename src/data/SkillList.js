@@ -1,7 +1,8 @@
 export const SkillList = {
   0: {
     name: 'Critical Boost',
-    defaultActiviation: 50,
+    defaultActiviation: 100,
+    fixedActivation: true,
     levels: [1, 2, 3], // Dummy values
   },
   1: {
@@ -200,5 +201,11 @@ export const SkillList = {
         rawModifier: 25,
       },
     ]
+  },
+  11: {
+    name: 'Non-elemental Boost',
+    defaultActiviation: 100,
+    fixedActivation: true,
+    levels: [1], // Dummy values
   },
 }

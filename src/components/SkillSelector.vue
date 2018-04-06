@@ -52,9 +52,8 @@ export default {
 
       <vue-select
         placeholder='Type to search...'
-        :clear-search-on-select='true'
         :options='skillList'
-        :on-change='skillSelected'
+        @input='skillSelected'
       />
     </div>
   </div>

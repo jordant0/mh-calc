@@ -1,6 +1,7 @@
 <script>
 import SkillSelector from '@/components/SkillSelector'
 import SkillDisplay from '@/components/SkillDisplay'
+import FindSkill from '@/mixins/FindSkill'
 import { SkillList } from '@/data/SkillList'
 
 export default {
@@ -11,17 +12,15 @@ export default {
     SkillDisplay,
   },
 
+  mixins: [
+    FindSkill,
+  ],
+
   props: {
     skills: Array,
   },
 
   methods: {
-    findSkillIndex(skillId) {
-      return this.skills.findIndex(function(skill) {
-        return skill.id === skillId;
-      });
-    },
-
     addSkill(skillId) {
       var skillIndex = this.findSkillIndex(skillId);
 

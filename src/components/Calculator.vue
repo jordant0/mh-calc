@@ -1,8 +1,13 @@
 <script>
+import FindSkill from '@/mixins/FindSkill'
 import { SkillList } from '@/data/SkillList'
 
 export default {
   name: 'Calculator',
+
+  mixins: [
+    FindSkill,
+  ],
 
   props: {
     weapon: Object,
@@ -11,6 +16,13 @@ export default {
       type: Object,
       default: {}
     }
+  },
+
+  created() {
+    this.specialSkills = {
+      criticalBoost: 0,
+      nonElemBoost: 11,
+    };
   },
 
   computed: {
@@ -33,35 +45,53 @@ export default {
       }
     },
 
+    weaponRaw() {
+      var skill = this.findSkill(this.specialSkills.nonElemBoost);
+
+      if(skill) {
+        return this.weapon.raw * 1.1;
+      }
+      else {
+        return this.weapon.raw;
+      }
+    },
+
     affinity() {
       return this.weapon.affinity / 100;
     },
 
     affinityMultiplier() {
-      var skillIndex = this.findSkillIndex(0); // Critical Boost
+      var skill = this.findSkill(this.specialSkills.criticalBoost);
 
-      if(skillIndex > 0) {
-        return 0.25 + this.skills[skillIndex].level * 0.05;
+      if(skill) {
+        return 0.25 + skill.level * 0.05;
       }
       else {
         return 0.25;
       }
     },
 
-    fixedSkills() {
+    skillsForCalculation() {
+      var _this = this;
       return this.skills.filter(function(skill) {
-        return skill.id !== 0 && skill.activation >= 100;
+        return Object.values(_this.specialSkills).indexOf(skill.id) === -1;
+      });
+    },
+
+    fixedSkills() {
+      return this.skillsForCalculation.filter(function(skill) {
+        return skill.activation >= 100;
       });
     },
 
     variableSkills() {
-      return this.skills.filter(function(skill) {
-        return skill.id !== 0 && skill.activation < 100 && skill.activation > 0;
+      return this.skillsForCalculation.filter(function(skill) {
+        return skill.activation < 100 && skill.activation > 0;
       });
     },
 
     fixedRawAndAffinity() {
-      var raw = this.weapon.raw,
+      var raw = this.weaponRaw,
           affinity = this.affinity;
 
       if(this.settings.debug && this.settings.verbose) {
@@ -110,6 +140,10 @@ export default {
       }
     },
 
+    displayFixeRaw() {
+      return this.roundToDecimal(this.fixedRawAndAffinity.raw);
+    },
+
     displayFixedAffinity() {
       return this.roundToDecimal(this.fixedRawAndAffinity.affinity * 100);
     },
@@ -120,12 +154,6 @@ export default {
   },
 
   methods: {
-    findSkillIndex(skillId) {
-      return this.skills.findIndex(function(skill) {
-        return skill.id === skillId;
-      });
-    },
-
     convertToDecimal(num, size) {
       var binary = (num >>> 0).toString(2),
           padding = '0'.repeat(size - binary.length);
@@ -201,7 +229,7 @@ export default {
   <div class='damage-display bordered-box'>
     <div class='damage-item damage-detail'>
       <span class='damage-label'>Fixed raw:</span>
-      <span class='damage-number'>{{ this.fixedRawAndAffinity.raw }}</span>
+      <span class='damage-number'>{{ displayFixeRaw }}</span>
     </div>
 
     <div class='damage-item damage-detail'>
@@ -211,7 +239,7 @@ export default {
 
     <div class='damage-item damage-detail'>
       <span class='damage-label'>Affinity multiplier:</span>
-      <span class='damage-number'>{{ affinityMultiplier }}%</span>
+      <span class='damage-number'>{{ affinityMultiplier }}</span>
     </div>
 
     <div class='damage-item damage-final'>
