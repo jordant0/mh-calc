@@ -4,6 +4,12 @@ export default {
 
   props: {
     weapon: Object,
+  },
+
+  methods: {
+    flipSign() {
+      this.weapon.affinity = -this.weapon.affinity;
+    }
   }
 }
 </script>
@@ -25,6 +31,7 @@ export default {
         />%
       </div>
     </div>
+    <a class='convert-to-negative' href='#' @click.prevent='flipSign'>Flip sign</a>
 
     <div class='input-item'>
       <span class='input-label'>Sharpness</span>
@@ -44,5 +51,14 @@ export default {
 .affinity-input {
   margin-right: 5px;
   width: 62px;
+}
+
+.convert-to-negative {
+  font-size: 12px;
+  text-align: right;
+  display: block;
+  margin-left: auto;
+  width: 122px;
+  margin-bottom: 4px;
 }
 </style>
