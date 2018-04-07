@@ -231,7 +231,7 @@ export default {
     },
 
     displayFixedAffinity() {
-      return this.roundToDecimal((this.affinity + this.fixedBonus.affinity) * 100);
+      return this.roundToDecimal(this.adjustAffinity(this.affinity + this.fixedBonus.affinity) * 100);
     },
 
     roundedFinalRaw() {
