@@ -71,6 +71,8 @@ export default {
               class='affinity-input input-field'
               type='number'
               v-model.number='weapon.affinity'
+              :min='-100'
+              :max='100'
             />%
           </div>
         </div>
@@ -97,7 +99,13 @@ export default {
         <div v-if='showActivation' class='input-item'>
           <span class='input-label'>Activation:</span>
           <div>
-            <input class='input-field activation-input' type='number' v-model='weapon.activation'/>%
+            <input
+              class='input-field activation-input'
+              type='number'
+              :min='0'
+              :max='100'
+              v-model='weapon.activation'
+            />%
           </div>
         </div>
       </div>

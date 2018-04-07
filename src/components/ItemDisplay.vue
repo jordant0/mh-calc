@@ -33,6 +33,14 @@ export default {
 
   methods: {
     updateItemActivation($event) {
+      if(this.item.activation > 100) {
+        this.item.activation = 100;
+      }
+
+      if(this.item.activation < 0) {
+        this.item.activation = 0;
+      }
+
       this.$emit('item-level-activation', this.item.id, parseInt($event.target.value));
     },
 
@@ -53,14 +61,19 @@ export default {
       <a class='remove-link' href='#' @click.prevent='removeItem'>x</a>
     </div>
 
-    <form v-if='enableActivationEdit' class='item-edit'>
-      <div class='input-item'>
-        <span class='input-label'>Activation:</span>
-        <div>
-          <input class='activation-input input-field' type='number' :value='item.activation' @change='updateItemActivation' />%
-        </div>
+    <div v-if='enableActivationEdit' class='input-item item-edit'>
+      <span class='input-label'>Activation:</span>
+      <div>
+        <input
+          class='activation-input input-field'
+          type='number'
+          :value='item.activation'
+          :min='0'
+          :max='100'
+          @change='updateItemActivation'
+        />%
       </div>
-    </form>
+    </div>
 
     <div v-if='showCategory' class='item-category'>
       <span class='input-label category-label'>Category:</span>

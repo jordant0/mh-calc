@@ -246,7 +246,15 @@ export default {
     },
 
     displayFixedAffinity() {
-      return this.roundToDecimal(this.adjustAffinity(this.affinity + this.fixedBonus.affinity) * 100);
+      return this.roundToDecimal((this.affinity + this.fixedBonus.affinity) * 100);
+    },
+
+    affinityClass() {
+      var classNames = ['damage-number'];
+      if(this.displayFixedAffinity < 0 || this.displayFixedAffinity > 100) {
+        classNames.push('affinity-overflow');
+      }
+      return classNames;
     },
 
     roundedFinalRaw() {
@@ -469,7 +477,7 @@ export default {
 
     <div class='damage-item damage-detail'>
       <span class='damage-label'>Fixed affinity:</span>
-      <span class='damage-number'>{{ displayFixedAffinity }}%</span>
+      <span :class='affinityClass'>{{ displayFixedAffinity }}%</span>
     </div>
 
     <div class='damage-item damage-detail'>
@@ -514,5 +522,9 @@ export default {
 
 .damage-final .damage-number {
   color: #62ff00;
+}
+
+.affinity-overflow {
+  color: #b30b0b;
 }
 </style>

@@ -32,6 +32,13 @@ export default {
     },
 
     updateSkillActivation($event) {
+      if(this.skill.activation > 100) {
+        this.skill.activation = 100;
+      }
+
+      if(this.skill.activation < 0) {
+        this.skill.activation = 0;
+      }
       this.$emit('skill-level-activation', this.skill.id, parseInt($event.target.value));
     },
 
@@ -52,7 +59,7 @@ export default {
       <a class='remove-link' href='#' @click.prevent='removeSkill'>x</a>
     </div>
 
-    <form class='skill-edit'>
+    <div class='skill-edit'>
       <div class='input-item'>
         <span class='input-label'>Level:</span>
         <select class='input-field' type='number' :value='skill.level' @change='updateSkillLevel'>
@@ -62,14 +69,20 @@ export default {
         </select>
       </div>
 
-
       <div v-if='enableActivationEdit' class='input-item'>
         <span class='input-label'>Activation:</span>
         <div>
-          <input class='activation-input input-field' type='number' :value='skill.activation' @change='updateSkillActivation' />%
+          <input
+            class='activation-input input-field'
+            type='number'
+            :value='skill.activation'
+            :min='0'
+            :max='100'
+            @change='updateSkillActivation'
+          />%
         </div>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 

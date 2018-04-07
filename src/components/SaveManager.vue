@@ -32,7 +32,18 @@ export default {
     return {
       editModalShown: false,
       saveName: '',
+      savesFile: null,
     }
+  },
+
+  watch: {
+    saves() {
+      this.createSaveFile();
+    },
+  },
+
+  created() {
+    this.createSaveFile();
   },
 
   mounted() {
@@ -110,6 +121,40 @@ export default {
       if(confirm('Are you SURE you want to delete all saved data?')) {
         this.$emit('update:saves', []);
       }
+    },
+
+    createSaveFile() {
+      var saveData = JSON.stringify(this.saves),
+          file = new Blob([saveData], {type: 'text/plain'});
+
+      if (this.savesFile !== null) {
+        window.URL.revokeObjectURL(this.savesFile);
+      }
+
+      this.savesFile = window.URL.createObjectURL(file);
+    },
+
+    importSave(event) {
+      if(event.target.files.length) {
+        var file = event.target.files[0],
+            reader = new FileReader();
+
+        reader.onload = this.processImportedSave;
+        reader.readAsText(file);
+      }
+    },
+
+    processImportedSave(event) {
+      var data = event.target.result;
+      if(confirm('Replace current save data with imported data?')) {
+        try {
+          var newSaves = JSON.parse(data);
+          this.$emit('update:saves', newSaves);
+        }
+        catch(e) {
+          console.log(e);
+        }
+      }
     }
   }
 }
@@ -135,6 +180,14 @@ export default {
           @restore-save='restoreSave'
           @overrite-save='overwriteSave'
         />
+      </div>
+
+      <div class='save-export-import'>
+        <a class='button' :href='savesFile' download='MHCalc-Saves.txt'>Export Saves</a>
+        <div class='import-wrapper'>
+          <a class='button' href='#' @click.prevent='triggerSaveImport'>Import Saves</a>
+          <input @change='importSave' class='saves-import' name='saves' type='file' accept='text/plain'>
+        </div>
       </div>
     </div>
 
@@ -166,5 +219,28 @@ export default {
 
 .clear-saves-links {
   font-size: 14px;
+}
+
+.save-export-import {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.import-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.saves-import {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.import-wrapper:hover, .saves-import:hover {
+  cursor: pointer;
 }
 </style>
