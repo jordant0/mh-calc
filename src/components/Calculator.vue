@@ -44,6 +44,17 @@ export default {
       return this.debugOn && this.settings.verbose;
     },
 
+    coatingMultiplier() {
+      switch(this.weapon.coating) {
+        case 'Power':
+          return 1.35;
+        case 'Close range':
+          return 1.18;
+        default:
+          return 1;
+      }
+    },
+
     sharpnessMultiplier() {
       switch(this.weapon.sharpness) {
         case 'White':
@@ -169,7 +180,7 @@ export default {
             skillData = this.getDataForSkill(skill);
 
         raw += skillData.raw;
-        affinity = this.adjustAffinity(affinity + skillData.affinity);
+        affinity += skillData.affinity;
       }
 
       return { raw, affinity, rawBoost };
