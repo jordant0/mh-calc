@@ -4,6 +4,9 @@ import RoundToDecimal from '@/mixins/RoundToDecimal'
 import JsonProcessor from '@/mixins/JsonProcessor'
 import { SkillList } from '@/data/SkillList'
 import { ItemList } from '@/data/ItemList'
+import { Sharpness } from '@/data/Sharpness'
+import { Weapons } from '@/data/Weapons'
+import { Coatings } from '@/data/Coatings'
 import { Augments } from '@/data/Augments'
 
 export default {
@@ -42,36 +45,6 @@ export default {
 
     verboseOn() {
       return this.debugOn && this.settings.verbose;
-    },
-
-    coatingMultiplier() {
-      switch(this.weapon.coating) {
-        case 'Power':
-          return 1.35;
-        case 'Close range':
-          return 1.18;
-        default:
-          return 1;
-      }
-    },
-
-    sharpnessMultiplier() {
-      switch(this.weapon.sharpness) {
-        case 'White':
-          return 1.32;
-        case 'Blue':
-          return 1.2;
-        case 'Green':
-          return 1.05;
-        case 'Yellow':
-          return 1;
-        case 'Red':
-          return 0.75;
-        case 'Orange':
-          return 0.50;
-        default:
-          return 1;
-      }
     },
 
     attackAugmentsBonus() {
@@ -116,6 +89,34 @@ export default {
       else {
         return 0.25;
       }
+    },
+
+    weaponCategory() {
+      return Weapons[this.weapon.type].category;
+    },
+
+    middleMultiplierLevel() {
+      if(this.weaponCategory === 'blademaster') {
+        return this.weapon.sharpness;
+      }
+      else if(this.weaponCategory === 'bow') {
+        return this.weapon.coating;
+      }
+      else {
+        return 0;
+      }
+    },
+
+    previousMultiplierLevel() {
+      var prev = this.middleMultiplierLevel - 1;
+      if(prev < 0) {
+        prev = 0;
+      }
+      return prev;
+    },
+
+    variableMiddleMultiplier() {
+      return this.weaponCategory !== 'gunner' && this.weapon.activation < 100 && this.middleMultiplierLevel !== this.previousMultiplierLevel;
     },
 
     skillsForCalculation() {
@@ -190,8 +191,17 @@ export default {
       var finalResult = 0,
           variablesCount = this.variableItems.length + this.variableSkills.length;
 
+      if(this.variableMiddleMultiplier) {
+        variablesCount += 1;
+      }
+
       if(variablesCount < 1) {
-        finalResult = this.averageRaw(this.fixedBonus.rawBoost, this.fixedBonus.raw, this.fixedBonus.affinity);
+        finalResult = this.averageRaw(
+          this.fixedBonus.rawBoost,
+          this.fixedBonus.raw,
+          this.middleMultiplierLevel,
+          this.fixedBonus.affinity
+        );
       }
       else {
         if(this.verboseOn) {
@@ -213,7 +223,12 @@ export default {
           }
 
           if(configResults.chance > 0) {
-            totalAverageRaw += this.averageRaw(configResults.rawBoost, configResults.raw, configResults.affinity) * configResults.chance;
+            totalAverageRaw += this.averageRaw(
+              configResults.rawBoost,
+              configResults.raw,
+              configResults.middleMultiplierLevel,
+              configResults.affinity
+            ) * configResults.chance;
           }
         }
         finalResult = totalAverageRaw;
@@ -250,17 +265,38 @@ export default {
       return `${padding}${binary}`;
     },
 
-    averageRaw(rawBoost, rawBonus, affinityBonus) {
+    sharpnessMultiplier(level) {
+      return Sharpness[level].multiplier;
+    },
+
+    coatingMultiplier(level) {
+      return Coatings[level].multiplier;
+    },
+
+    middleMultiplier(level) {
+      if(this.weaponCategory === 'blademaster') {
+        return this.sharpnessMultiplier(level);
+      }
+      else if(this.weaponCategory === 'bow') {
+        return this.coatingMultiplier(level);
+      }
+      else {
+        return 1;
+      }
+    },
+
+    averageRaw(rawBoost, rawBonus, middleMultiplierLevel, affinityBonus) {
       var multiplier = this.affinityMultiplier,
-          affinity = this.adjustAffinity(this.affinity + affinityBonus);
+          affinity = this.adjustAffinity(this.affinity + affinityBonus),
+          middleMultiplier = this.middleMultiplier(middleMultiplierLevel);
 
       if(affinity < 0) {
         multiplier = .25;
       }
 
-      var result = (this.weaponRaw * rawBoost + rawBonus) * this.sharpnessMultiplier * (1 + (affinity * multiplier));
+      var result = (this.weaponRaw * rawBoost + rawBonus) * middleMultiplier * (1 + (affinity * multiplier));
       if(this.settings.debug) {
-        console.log(`> (${this.weaponRaw} * ${rawBoost} + ${rawBonus}) * ${this.sharpnessMultiplier} * (1 + (${affinity} * ${multiplier})) = ${result}`);
+        console.log(`> (${this.weaponRaw} * ${rawBoost} + ${rawBonus}) * ${middleMultiplier} * (1 + (${affinity} * ${multiplier})) = ${result}`);
       }
       return result;
     },
@@ -276,7 +312,21 @@ export default {
           raw = this.fixedBonus.raw,
           affinity = this.fixedBonus.affinity,
           rawBoost = this.fixedBonus.rawBoost,
+          middleMultiplierLevel = this.middleMultiplierLevel,
           chance = 1;
+
+      if(this.variableMiddleMultiplier) {
+        activation = this.weapon.activation / 100;
+        if(config[configIndex] === '1') { // Current sharpness/coating level
+          middleMultiplierLevel = this.middleMultiplierLevel;
+          chance *= activation;
+        }
+        else {  // Drop down to previous sharpness/coating
+          middleMultiplierLevel = this.previousMultiplierLevel;
+          chance *= (1 - activation);
+        }
+        configIndex++;
+      }
 
       for (var i = 0; i < this.variableItems.length; i++) {
         var item = this.variableItems[i],
@@ -317,7 +367,13 @@ export default {
         configIndex++;
       }
 
-      return { raw, affinity, rawBoost, chance };
+      return {
+        raw,
+        affinity,
+        rawBoost,
+        middleMultiplierLevel,
+        chance,
+      };
     },
 
     getDataForSkill(skill) {

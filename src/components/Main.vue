@@ -34,6 +34,16 @@ export default {
       }
     },
 
+    'weapon.activation': function() {
+      if(this.weapon.activation > 100) {
+        this.weapon.activation = 100;
+      }
+
+      if(this.weapon.activation < 0) {
+        this.weapon.activation = 0;
+      }
+    },
+
     saves: function() {
       this.saveToLocalStorage(LOCAL_STORAGE_KEY, this.saves);
     },
@@ -42,9 +52,12 @@ export default {
   data() {
     return {
       weapon: {
+        type: 1,
         raw: 200,
         affinity: 0,
-        sharpness: 'Green',
+        sharpness: 3, // Green
+        coating: 2, // Power
+        activation: 100,
         augments: [0, 0, 0],
       },
       skills: [],
@@ -55,7 +68,7 @@ export default {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.2.5',
+        version: '0.3.0',
       },
     }
   },
