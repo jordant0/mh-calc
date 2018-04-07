@@ -19,6 +19,7 @@ export default {
   props: {
     weapon: Object,
     skills: Array,
+    items: Array,
     finalRaw: Number,
     saves: Array,
     settings: {
@@ -31,6 +32,7 @@ export default {
     return {
       editModalShown: false,
       saveName: '',
+      customName: false,
     }
   },
 
@@ -41,7 +43,9 @@ export default {
 
   methods: {
     getSaveName() {
-      this.saveName = this.getTimeStamp();
+      if(!this.customName || !this.saveName.length) {
+        this.saveName = this.getTimeStamp();
+      }
       this.editModalShown = true;
     },
 
@@ -55,12 +59,22 @@ export default {
     },
 
     saveData(name) {
+      if(name.length) {
+        this.saveName = name;
+        this.customName = true;
+      }
+      else {
+        name = this.getTimeStamp();
+        this.customName = false;
+      }
+
       this.closeEditModal();
 
       var saveData = {
         name,
         weapon: this.deepClone(this.weapon),
         skills: this.deepClone(this.skills),
+        items: this.deepClone(this.items),
         finalRaw: this.deepClone(this.finalRaw),
       };
 
@@ -83,6 +97,7 @@ export default {
       if(save) {
         this.$emit('update:weapon', save.weapon);
         this.$emit('update:skills', save.skills);
+        this.$emit('update:items', save.items);
       }
     },
 
@@ -96,7 +111,7 @@ export default {
 </script>
 
 <template>
-  <div class='save-area'>
+  <span class='save-area'>
     <div class='save-manager bordered-box'>
       <div class='save-actions'>
         <a class='clear-saves-links' href='#' @click.prevent='clearAllSaves'>Clear All Saves</a>
@@ -106,7 +121,7 @@ export default {
       <div class='saves-display'>
         <save-display
           v-for='(save, index) in saves'
-          :key='save.name'
+          :key='index'
           :save='save'
           :index='index'
           :settings='settings'
@@ -123,7 +138,7 @@ export default {
       @close='closeEditModal'
       @save='saveData'
     />
-  </div>
+  </span>
 </template>
 
 <style>
@@ -133,7 +148,7 @@ export default {
   box-sizing: border-box;
   position: -webkit-sticky;
   position: sticky;
-  top: 0;
+  top: 24px;
   max-height: calc(100vh - 150px);
   overflow-y: auto;
 }

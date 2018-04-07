@@ -1,10 +1,10 @@
 <script>
 import VueSelect from 'vue-select'
 import OptionsForSelect from '@/mixins/OptionsForSelect'
-import { SkillList } from '@/data/SkillList'
+import { ItemList } from '@/data/ItemList'
 
 export default {
-  name: 'SkillSelector',
+  name: 'ItemSelector',
 
   mixins: [
     OptionsForSelect,
@@ -16,29 +16,29 @@ export default {
 
   data() {
     return {
-      skillList: this.convertToOptions(SkillList),
+      itemList: this.convertToOptions(ItemList),
     }
   },
 
   methods: {
-    skillSelected(option) {
-      this.$emit('skill-added', option.value);
+    itemSelected(option) {
+      this.$emit('item-added', option.value);
     },
   },
 }
 </script>
 
 <template>
-  <div class='skill-selector'>
-    <div class='skills-input input-item select-wrapper'>
+  <div class='item-selector'>
+    <div class='items-input input-item select-wrapper'>
       <span class='input-label'>
-        Select skills
+        Select item/buff
       </span>
 
       <vue-select
         placeholder='Type to search...'
-        :options='skillList'
-        @input='skillSelected'
+        :options='itemList'
+        @input='itemSelected'
       />
     </div>
   </div>

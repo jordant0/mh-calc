@@ -11,11 +11,13 @@ export default {
 </template>
 
 <style>
+html {
+  overflow: auto;
+}
+
 body {
-  min-height: 100vh;
   margin: 0;
   background-color: #1d2120;
-  overflow: hidden;
 }
 
 #app {

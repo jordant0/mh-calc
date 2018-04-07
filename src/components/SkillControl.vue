@@ -1,7 +1,7 @@
 <script>
 import SkillSelector from '@/components/SkillSelector'
 import SkillDisplay from '@/components/SkillDisplay'
-import FindSkill from '@/mixins/FindSkill'
+import ListLookup from '@/mixins/ListLookup'
 import { SkillList } from '@/data/SkillList'
 
 export default {
@@ -13,7 +13,7 @@ export default {
   },
 
   mixins: [
-    FindSkill,
+    ListLookup,
   ],
 
   props: {

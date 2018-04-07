@@ -1,19 +1,23 @@
 <script>
-import FindSkill from '@/mixins/FindSkill'
+import ListLookup from '@/mixins/ListLookup'
 import RoundToDecimal from '@/mixins/RoundToDecimal'
+import JsonProcessor from '@/mixins/JsonProcessor'
 import { SkillList } from '@/data/SkillList'
+import { ItemList } from '@/data/ItemList'
 
 export default {
   name: 'Calculator',
 
   mixins: [
-    FindSkill,
+    ListLookup,
     RoundToDecimal,
+    JsonProcessor,
   ],
 
   props: {
     weapon: Object,
     skills: Array,
+    items: Array,
     finalRaw: Number,
     settings: {
       type: Object,
@@ -26,9 +30,19 @@ export default {
       criticalBoost: 0,
       nonElemBoost: 11,
     };
+
+    this.categoriesQueue = [];
   },
 
   computed: {
+    debugOn() {
+      return this.settings.debug;
+    },
+
+    verboseOn() {
+      return this.debugOn && this.settings.verbose;
+    },
+
     sharpnessMultiplier() {
       switch(this.weapon.sharpness) {
         case 'White':
@@ -77,7 +91,7 @@ export default {
     skillsForCalculation() {
       var _this = this;
       return this.skills.filter(function(skill) {
-        return Object.values(_this.specialSkills).indexOf(skill.id) === -1;
+        return Object.values(_this.specialSkills).indexOf(skill.id) === -1 && skill.activation > 0;
       });
     },
 
@@ -89,57 +103,87 @@ export default {
 
     variableSkills() {
       return this.skillsForCalculation.filter(function(skill) {
-        return skill.activation < 100 && skill.activation > 0;
+        return skill.activation < 100;
       });
     },
 
-    fixedRawAndAffinity() {
-      var raw = this.weaponRaw,
-          affinity = this.affinity;
+    itemsForCalculation() {
+      return this.items.filter(function(item) {
+        return item.activation > 0;
+      });
+    },
 
-      if(this.settings.debug && this.settings.verbose) {
+    fixedItems() {
+      return this.itemsForCalculation.filter(function(item) {
+        return item.activation >= 100;
+      });
+    },
+
+    variableItems() {
+      return this.itemsForCalculation.filter(function(item) {
+        return item.activation < 100;
+      });
+    },
+
+    fixedBonus() {
+      var raw = 0,
+          affinity = 0,
+          rawBoost = 1;
+
+      this.categoriesQueue = {}; // Reset category queue
+
+      if(this.verboseOn) {
         console.log('[ Calculating fixed raw and affinity ]');
       }
 
-      for (var i = 0; i < this.fixedSkills.length; i++) {
-        var skill = this.fixedSkills[i],
-            skillData = this.getRawAndAffinityForSkill(skill);
+      for(var i = 0; i < this.fixedItems.length; i++) {
+        var item = this.fixedItems[i],
+            itemData = this.adjustedItemBonus(item);
 
-        raw += skillData.raw;
-        affinity += skillData.affinity;;
-
-        affinity = Math.min(1, affinity);
-        affinity = Math.max(-1, affinity);
+        raw += itemData.raw;
+        affinity += itemData.affinity;
+        rawBoost *= itemData.rawBoost;
       }
 
-      return { raw, affinity };
+      for(var i = 0; i < this.fixedSkills.length; i++) {
+        var skill = this.fixedSkills[i],
+            skillData = this.getDataForSkill(skill);
+
+        raw += skillData.raw;
+        affinity = this.adjustAffinity(affinity + skillData.affinity);
+      }
+
+      return { raw, affinity, rawBoost };
     },
 
     finalAverageRaw() {
       var finalResult = 0,
-          variablesCount = this.variableSkills.length;
+          variablesCount = this.variableItems.length + this.variableSkills.length;
 
       if(variablesCount < 1) {
-        finalResult = this.averageRaw(this.fixedRawAndAffinity.raw, this.fixedRawAndAffinity.affinity);
+        finalResult = this.averageRaw(this.fixedBonus.rawBoost, this.fixedBonus.raw, this.fixedBonus.affinity);
       }
       else {
-        if(this.settings.debug && this.settings.verbose) {
-          console.log(`[ Calculating variable raw and affinity | Fixed Raw: ${this.fixedRawAndAffinity.raw} | Fixed Affinity: ${this.fixedRawAndAffinity.affinity} ]`);
+        if(this.verboseOn) {
+          console.log(`[ Calculating variable raw and affinity ]`);
         }
 
         var permutations = 2 ** variablesCount,
-            totalAverageRaw = 0;
+            totalAverageRaw = 0,
+            fixedQueue = this.deepClone(this.categoriesQueue);
 
         for (var i = 0; i < permutations; i++) {
           var config = this.convertToDecimal(i, variablesCount),
-              configResults = this.getRawAndAffinityForConfig(config);
+              configResults = this.getBonusForConfig(config);
 
-          if(this.settings.debug) {
+          this.categoriesQueue = this.deepClone(fixedQueue); // Reset queue each time
+
+          if(this.debugOn) {
             console.log(`Calculating raw for configuration ${config}. Chance: ${configResults.chance * 100}%`);
           }
 
           if(configResults.chance > 0) {
-            totalAverageRaw += this.averageRaw(configResults.raw, configResults.affinity) * configResults.chance;
+            totalAverageRaw += this.averageRaw(configResults.rawBoost, configResults.raw, configResults.affinity) * configResults.chance;
           }
         }
         finalResult = totalAverageRaw;
@@ -153,11 +197,11 @@ export default {
     },
 
     displayFixeRaw() {
-      return this.roundToDecimal(this.fixedRawAndAffinity.raw);
+      return this.roundToDecimal(this.weaponRaw * this.fixedBonus.rawBoost + this.fixedBonus.raw, 0);
     },
 
     displayFixedAffinity() {
-      return this.roundToDecimal(this.fixedRawAndAffinity.affinity * 100);
+      return this.roundToDecimal((this.affinity + this.fixedBonus.affinity) * 100);
     },
 
     roundedFinalRaw() {
@@ -172,37 +216,63 @@ export default {
       return `${padding}${binary}`;
     },
 
-    averageRaw(rawValue, affinity) {
-      var multiplier = this.affinityMultiplier
+    averageRaw(rawBoost, rawBonus, affinityBonus) {
+      var multiplier = this.affinityMultiplier,
+          affinity = this.adjustAffinity(this.affinity + affinityBonus);
+
       if(affinity < 0) {
         multiplier = .25;
       }
 
-      var result = rawValue * this.sharpnessMultiplier * (1 + affinity * multiplier);
+      var result = (this.weaponRaw * rawBoost + rawBonus) * this.sharpnessMultiplier * (1 + (affinity * multiplier));
       if(this.settings.debug) {
-        console.log(`> ${rawValue} * ${this.sharpnessMultiplier} * (1 + ${affinity} * ${multiplier}) = ${result}`);
+        console.log(`> (${this.weaponRaw} * ${rawBoost} + ${rawBonus}) * ${this.sharpnessMultiplier} * (1 + (${affinity} * ${multiplier})) = ${result}`);
       }
       return result;
     },
 
-    getRawAndAffinityForConfig(config) {
+    adjustAffinity(affinity) {
+      affinity = Math.min(1, affinity);
+      affinity = Math.max(-1, affinity);
+      return affinity;
+    },
+
+    getBonusForConfig(config) {
       var configIndex = 0,
-          raw = this.fixedRawAndAffinity.raw,
-          affinity = this.fixedRawAndAffinity.affinity,
+          raw = this.fixedBonus.raw,
+          affinity = this.fixedBonus.affinity,
+          rawBoost = this.fixedBonus.rawBoost,
           chance = 1;
+
+      for (var i = 0; i < this.variableItems.length; i++) {
+        var item = this.variableItems[i],
+            activation = item.activation / 100;
+
+        if(config[configIndex] === '1') { // Item is activated
+          var itemData = this.adjustedItemBonus(item);
+
+          raw += itemData.raw;
+          affinity += itemData.affinity;
+          rawBoost *= itemData.rawBoost;
+
+          chance *= activation;
+        }
+        else {  // Item is not activated
+          chance *= (1 - activation);
+        }
+
+        configIndex++;
+      }
 
       for (var i = 0; i < this.variableSkills.length; i++) {
         var skill = this.variableSkills[i],
             activation = skill.activation / 100;
 
         if(config[configIndex] === '1') { // Skill is activated
-          var skillData = this.getRawAndAffinityForSkill(skill);
+          var skillData = this.getDataForSkill(skill);
 
           raw += skillData.raw;
           affinity += skillData.affinity;
-
-          affinity = Math.min(1, affinity);
-          affinity = Math.max(-1, affinity);
 
           chance *= activation;
         }
@@ -213,19 +283,88 @@ export default {
         configIndex++;
       }
 
-      return { raw, affinity, chance };
+      return { raw, affinity, rawBoost, chance };
     },
 
-    getRawAndAffinityForSkill(skill) {
+    getDataForSkill(skill) {
       var skillData = SkillList[skill.id],
           raw = skillData.levels[skill.level - 1].rawModifier || 0,
           affinity = skillData.levels[skill.level - 1].affinityModifier || 0;
 
-      if(this.settings.debug && this.settings.verbose) {
+      if(this.verboseOn) {
         console.log(`Checking data for skill "${skillData.name}" lv ${skill.level} | Raw: ${raw} | Affinity: ${affinity}`);
       }
 
       return { raw, affinity };
+    },
+
+    getDataForItem(item) {
+      var itemData = ItemList[item.id],
+          raw = itemData.effect.rawModifier || 0,
+          affinity = itemData.effect.affinityModifier || 0,
+          rawBoost = 1;
+
+      if(itemData.effect.rawBoost) {
+        rawBoost = 1 + itemData.effect.rawBoost;
+      }
+
+      if(this.verboseOn) {
+        console.log(`Checking data for item "${itemData.name}" | Raw: ${raw} | Affinity: ${affinity} | Raw Boost: ${rawBoost}`);
+      }
+
+      return { raw, affinity, rawBoost };
+    },
+
+    adjustedItemBonus(item) {
+      var itemData = ItemList[item.id],
+          itemBonus = this.getDataForItem(item);
+
+      if(itemData.itemCategory) {
+        if(this.categoriesQueue[itemData.itemCategory]) { // Handle other active items in same category
+          var previousConfig = this.categoriesQueue[itemData.itemCategory],
+              stats = [
+                { name: 'raw', multiplicative: false },
+                { name: 'affinity', multiplicative: false },
+                { name: 'rawBoost', multiplicative: true },
+              ];
+
+          for(var i = 0; i < stats.length; i++) {
+            var stat = stats[i],
+                defaultValue = (stat.multiplicative ? 1 : 0),
+                oldBonus = (previousConfig[stat.name] || defaultValue),
+                newBonus = (itemBonus[stat.name] || defaultValue);
+
+            if(newBonus > defaultValue && oldBonus > defaultValue) {
+              if(oldBonus >= newBonus) {
+                if(this.verboseOn) {
+                  console.log(`Stronger ${stat.name} effect for item "${itemData.name}" already exists, nullifying bonus`);
+                }
+                itemBonus[stat.name] = defaultValue;
+              }
+              else {
+                if(stat.multiplicative) {
+                  itemBonus[stat.name] = newBonus / oldBonus;
+                }
+                else {
+                  itemBonus[stat.name] = newBonus - oldBonus;
+                }
+                if(this.verboseOn) {
+                  console.log(`Weaker ${stat.name} effect for item "${itemData.name}" already exists at ${oldBonus}. Applying a difference of ${itemBonus[stat.name]}`);
+                }
+                this.categoriesQueue[itemData.itemCategory][stat.name] = newBonus;
+              };
+            }
+          }
+        }
+        else {
+          if(this.verboseOn) {
+            console.log(`Initializing category queue for category ${item.itemCategory}`);
+          }
+          this.categoriesQueue[itemData.itemCategory] = this.deepClone(itemBonus);
+        }
+      }
+
+      return itemBonus;
     },
   },
 }

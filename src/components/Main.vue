@@ -2,6 +2,7 @@
 import WeaponInput from '@/components/WeaponInput'
 import Calculator from '@/components/Calculator'
 import SkillControl from '@/components/SkillControl'
+import ItemControl from '@/components/ItemControl'
 import SaveManager from '@/components/SaveManager'
 import JsonProcessor from '@/mixins/JsonProcessor'
 
@@ -18,6 +19,7 @@ export default {
     WeaponInput,
     Calculator,
     SkillControl,
+    ItemControl,
     SaveManager,
   },
 
@@ -45,13 +47,14 @@ export default {
         sharpness: 'Green'
       },
       skills: [],
+      items: [],
       finalRaw: 0,
       saves: this.loadFromLocalStorage(LOCAL_STORAGE_KEY, []),
       settings: {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.1.1',
+        version: '0.2.1',
       },
     }
   },
@@ -77,6 +80,7 @@ export default {
       <save-manager
         :weapon.sync='weapon'
         :skills.sync='skills'
+        :items.sync='items'
         :settings='settings'
         :final-raw='finalRaw'
         :saves.sync='saves'
@@ -91,15 +95,16 @@ export default {
           <calculator
             :weapon='weapon'
             :skills='skills'
+            :items='items'
             :settings='settings'
             :final-raw='finalRaw'
             @updated-final-raw='updatedFinalRaw'
           />
         </div>
 
-        <div class='skills-col'>
-          <skill-control :skills.sync='skills' />
-        </div>
+        <skill-control :skills.sync='skills' />
+
+        <item-control :items.sync='items' />
       </div>
     </div>
   </div>
@@ -112,6 +117,8 @@ export default {
 }
 
 h1 {
+  margin: 0;
+  padding-top: 20px;
   color: #e6d027;
 }
 
@@ -126,7 +133,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin-top: 40px;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
 .bordered-box {
@@ -196,5 +203,15 @@ a:hover {
   width: 20px;
   border: 1px solid #bbbbbb;
   border-radius: 50%;
+}
+
+.v-select .dropdown-toggle {
+  border-color: white !important;
+  background-color: white !important;
+  width: 500px;
+}
+
+.select-wrapper {
+  width: 680px;
 }
 </style>

@@ -123,7 +123,7 @@ export const SkillList = {
   },
   6: {
     name: 'Peak Performance',
-    defaultActiviation: 50,
+    defaultActiviation: 25,
     levels: [
       {
         rawModifier: 5,
