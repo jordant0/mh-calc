@@ -44,7 +44,8 @@ export default {
       weapon: {
         raw: 200,
         affinity: 0,
-        sharpness: 'Green'
+        sharpness: 'Green',
+        augments: [0, 0, 0],
       },
       skills: [],
       items: [],
@@ -54,7 +55,7 @@ export default {
         debug: false,
         verbose: false,
         precision: 2,
-        version: '0.2.1',
+        version: '0.2.3',
       },
     }
   },
@@ -88,9 +89,7 @@ export default {
 
       <div class='current-data'>
         <div class='general-data'>
-          <div class='weapon-col bordered-box'>
-            <weapon-input :weapon='weapon' />
-          </div>
+          <weapon-input :weapon='weapon' />
 
           <calculator
             :weapon='weapon'

@@ -43,8 +43,14 @@ export default {
     },
 
     restoreSave() {
-      if(confirm('Override current data with save data?')) {
+      if(confirm('Overwrite current data with save data?')) {
         this.$emit('restore-save', this.index);
+      }
+    },
+
+    overwriteSave() {
+      if(confirm('Overwrite this save with current data?')) {
+        this.$emit('overrite-save', this.index);
       }
     },
   }
@@ -79,6 +85,7 @@ export default {
 
     <div class='save-detail-actions'>
       <a class='button' href='#' @click.prevent='restoreSave'>Restore</a>
+      <a class='overwrite-link' href='#' @click.prevent='overwriteSave'>Overwrite</a>
     </div>
   </div>
 </template>
@@ -155,6 +162,8 @@ export default {
 
 .save-detail-actions {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   margin-top: 12px;
 }
 </style>

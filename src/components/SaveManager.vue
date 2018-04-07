@@ -32,7 +32,6 @@ export default {
     return {
       editModalShown: false,
       saveName: '',
-      customName: false,
     }
   },
 
@@ -43,9 +42,7 @@ export default {
 
   methods: {
     getSaveName() {
-      if(!this.customName || !this.saveName.length) {
-        this.saveName = this.getTimeStamp();
-      }
+      this.saveName = this.getTimeStamp();
       this.editModalShown = true;
     },
 
@@ -58,25 +55,24 @@ export default {
       this.editModalShown = false;
     },
 
-    saveData(name) {
-      if(name.length) {
-        this.saveName = name;
-        this.customName = true;
-      }
-      else {
-        name = this.getTimeStamp();
-        this.customName = false;
-      }
-
-      this.closeEditModal();
-
-      var saveData = {
+    getSaveData(name) {
+      return {
         name,
         weapon: this.deepClone(this.weapon),
         skills: this.deepClone(this.skills),
         items: this.deepClone(this.items),
         finalRaw: this.deepClone(this.finalRaw),
       };
+    },
+
+    saveData(name) {
+      if(!name.length) {
+        name = this.getTimeStamp();
+      }
+
+      this.closeEditModal();
+
+      var saveData = this.getSaveData(name);
 
       var newSaves = this.saves;
       newSaves.push(saveData);
@@ -95,10 +91,19 @@ export default {
     restoreSave(index) {
       var save = this.saves[index];
       if(save) {
-        this.$emit('update:weapon', save.weapon);
-        this.$emit('update:skills', save.skills);
-        this.$emit('update:items', save.items);
+        this.$emit('update:weapon', this.deepClone(save.weapon));
+        this.$emit('update:skills', this.deepClone(save.skills));
+        this.$emit('update:items', this.deepClone(save.items));
       }
+    },
+
+    overwriteSave(index) {
+      var save = this.saves[index],
+          saveData = this.getSaveData(save.name),
+          newSaves = this.deepClone(this.saves);
+
+      newSaves[index] = saveData;
+      this.$emit('update:saves', newSaves);
     },
 
     clearAllSaves() {
@@ -128,6 +133,7 @@ export default {
           :current-final-raw='finalRaw'
           @remove-save='removeSave'
           @restore-save='restoreSave'
+          @overrite-save='overwriteSave'
         />
       </div>
     </div>

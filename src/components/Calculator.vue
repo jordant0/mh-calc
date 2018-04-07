@@ -4,6 +4,7 @@ import RoundToDecimal from '@/mixins/RoundToDecimal'
 import JsonProcessor from '@/mixins/JsonProcessor'
 import { SkillList } from '@/data/SkillList'
 import { ItemList } from '@/data/ItemList'
+import { Augments } from '@/data/Augments'
 
 export default {
   name: 'Calculator',
@@ -62,19 +63,37 @@ export default {
       }
     },
 
-    weaponRaw() {
-      var skill = this.findSkill(this.specialSkills.nonElemBoost);
+    attackAugmentsBonus() {
+      return 5 * this.getAugmentCount(Augments['Attack']);
+    },
 
-      if(skill) {
-        return this.weapon.raw * 1.1;
+    affinityAugmentsBonus() {
+      var count = this.getAugmentCount(Augments['Affinity']);
+      if(count < 1) {
+        return 0;
+      }
+      else if(count === 1) {
+        return 10;
       }
       else {
-        return this.weapon.raw;
+        return 10 + 5 * (count - 1);
+      }
+    },
+
+    weaponRaw() {
+      var raw = this.weapon.raw + this.attackAugmentsBonus,
+          skill = this.findSkill(this.specialSkills.nonElemBoost);
+
+      if(skill) {
+        return raw * 1.1;
+      }
+      else {
+        return raw;
       }
     },
 
     affinity() {
-      return this.weapon.affinity / 100;
+      return (this.weapon.affinity + this.affinityAugmentsBonus) / 100;
     },
 
     affinityMultiplier() {
@@ -210,6 +229,10 @@ export default {
   },
 
   methods: {
+    getAugmentCount(augment) {
+      return this.weapon.augments.filter(x => x === augment).length;
+    },
+
     convertToDecimal(num, size) {
       var binary = (num >>> 0).toString(2),
           padding = '0'.repeat(size - binary.length);
@@ -396,7 +419,7 @@ export default {
 
 <style>
 .damage-display {
-  max-width: 400px;
+  max-width: 320px;
   flex: 1;
   margin-bottom: auto;
 }
@@ -416,6 +439,10 @@ export default {
   font-weight: 600;
   margin-top: 30px;
   margin-bottom: 0;
+}
+
+.damage-label {
+  text-align: left;
 }
 
 .damage-final .damage-number {
