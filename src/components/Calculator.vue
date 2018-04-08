@@ -32,7 +32,6 @@ export default {
   created() {
     this.specialSkills = {
       criticalBoost: 0,
-      nonElemBoost: 11,
     };
 
     this.categoriesQueue = [];
@@ -65,15 +64,7 @@ export default {
     },
 
     weaponRaw() {
-      var raw = this.weapon.raw + this.attackAugmentsBonus,
-          skill = this.findSkill(this.specialSkills.nonElemBoost);
-
-      if(skill) {
-        return raw * 1.1;
-      }
-      else {
-        return raw;
-      }
+      return this.weapon.raw + this.attackAugmentsBonus;
     },
 
     affinity() {
@@ -182,6 +173,7 @@ export default {
 
         raw += skillData.raw;
         affinity += skillData.affinity;
+        rawBoost *= skillData.rawBoost;
       }
 
       return { raw, affinity, rawBoost };
@@ -365,6 +357,7 @@ export default {
 
           raw += skillData.raw;
           affinity += skillData.affinity;
+          rawBoost *= skillData.rawBoost;
 
           chance *= activation;
         }
@@ -386,14 +379,20 @@ export default {
 
     getDataForSkill(skill) {
       var skillData = SkillList[skill.id],
-          raw = skillData.levels[skill.level - 1].rawModifier || 0,
-          affinity = skillData.levels[skill.level - 1].affinityModifier || 0;
+          effect = skillData.levels[skill.level - 1],
+          raw = effect.rawModifier || 0,
+          affinity = effect.affinityModifier || 0,
+          rawBoost = 1;
+
+      if(effect.rawBoost) {
+        rawBoost = 1 + effect.rawBoost;
+      }
 
       if(this.verboseOn) {
         console.log(`Checking data for skill "${skillData.name}" lv ${skill.level} | Raw: ${raw} | Affinity: ${affinity}`);
       }
 
-      return { raw, affinity };
+      return { raw, affinity, rawBoost };
     },
 
     getDataForItem(item) {
@@ -500,7 +499,7 @@ export default {
 }
 
 .damage-detail {
-  color: #777777;
+  color: #5f5f5f;
 }
 
 .damage-final {
@@ -519,6 +518,6 @@ export default {
 }
 
 .affinity-overflow {
-  color: #b30b0b;
+  color: #d80000;
 }
 </style>

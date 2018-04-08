@@ -126,7 +126,7 @@ export default {
 
 <style>
 .type-field {
-  width: 130px;
+  width: 145px;
 }
 
 .weapon-info .input-field {

@@ -56,12 +56,12 @@ export default {
         {{ skillName }}
       </div>
 
-      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeSkill'>
+      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeSkill' title='Remove'>
         <span class='glyphicon glyphicon-remove'></span>
       </a>
     </div>
 
-    <div class='skill-edit'>
+    <div class='skill-edit skill-item-edit'>
       <div class='input-item'>
         <span class='input-label'>Level:</span>
         <select class='input-field' type='number' :value='skill.level' @change='updateSkillLevel'>
@@ -90,9 +90,7 @@ export default {
 
 <style>
 .skill-edit {
-  display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
 .skill-edit .input-label {

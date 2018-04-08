@@ -7,6 +7,7 @@ import SaveManager from '@/components/SaveManager'
 import JsonProcessor from '@/mixins/JsonProcessor'
 
 const LOCAL_STORAGE_KEY = 'MhCalc-SavedData';
+const LOCAL_STORAGE_VERSION = 'MhCalc-SaveVersion';
 
 export default {
   name: 'Main',
@@ -52,6 +53,7 @@ export default {
 
     saves: function() {
       this.saveToLocalStorage(LOCAL_STORAGE_KEY, this.saves);
+      window.localStorage.setItem(LOCAL_STORAGE_VERSION, this.settings.version);
     },
   },
 
@@ -74,7 +76,7 @@ export default {
         debug: this.$route.query.debug === 'true',
         verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '1.0.0',
+        version: '1.0.2',
         contactEmail: 'mhw.calc.dev@gmail.com',
       },
       showSaveSection: false,
@@ -368,6 +370,15 @@ export default {
   font-size: 18px;
   text-align: left;
   margin-bottom: 12px;
+}
+
+.skill-item-edit {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.skill-item-edit.input-item, .skill-item-edit .input-item {
+  padding: 0;
 }
 
 .footer {

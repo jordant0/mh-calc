@@ -129,7 +129,8 @@ export default {
     },
 
     createSaveFile() {
-      var saveData = JSON.stringify(this.saves),
+      var saveInfo = { version: this.settings.version, data: this.saves },
+          saveData = JSON.stringify(saveInfo),
           file = new Blob([saveData], {type: 'text/plain'});
 
       if (this.savesFile !== null) {
@@ -150,10 +151,10 @@ export default {
     },
 
     processImportedSave(event) {
-      var data = event.target.result;
+      var content = event.target.result;
       if(confirm('Replace current save data with imported data?')) {
         try {
-          var newSaves = JSON.parse(data);
+          var newSaves = JSON.parse(content).data;
           this.$emit('update:saves', newSaves);
         }
         catch(e) {

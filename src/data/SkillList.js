@@ -206,6 +206,31 @@ export const SkillList = {
     name: 'Non-elemental Boost',
     defaultActiviation: 100,
     fixedActivation: true,
-    levels: [1], // Dummy values
+    levels: [
+      {
+        rawBoost: .10,
+      },
+    ],
+  },
+  12: {
+    name: 'Heroics',
+    defaultActiviation: 10,
+    levels: [
+      {
+        rawBoost: .05,
+      },
+      {
+        rawBoost: .10,
+      },
+      {
+        rawBoost: .15,
+      },
+      {
+        rawBoost: .20,
+      },
+      {
+        rawBoost: .30,
+      },
+    ],
   },
 }

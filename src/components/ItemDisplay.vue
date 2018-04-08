@@ -58,12 +58,12 @@ export default {
         {{ itemName }}
       </div>
 
-      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeItem'>
+      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeItem' title='Remove'>
         <span class='glyphicon glyphicon-remove'></span>
       </a>
     </div>
 
-    <div v-if='enableActivationEdit' class='input-item item-edit'>
+    <div v-if='enableActivationEdit' class='input-item item-edit skill-item-edit'>
       <span class='input-label'>Activation:</span>
       <div>
         <input
@@ -86,9 +86,7 @@ export default {
 
 <style>
 .item-edit {
-  display: flex;
   justify-content: flex-end;
-  flex-wrap: wrap;
 }
 
 .item-edit .input-label {
