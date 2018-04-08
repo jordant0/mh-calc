@@ -65,12 +65,19 @@ export default {
       finalRaw: 0,
       saves: this.loadFromLocalStorage(LOCAL_STORAGE_KEY, []),
       settings: {
-        debug: false,
-        verbose: false,
+        debug: this.$route.query.debug === 'true',
+        verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '0.4.1',
+        version: '0.4.2',
+        contactEmail: 'mhw.calc.dev@gmail.com',
       },
     }
+  },
+
+  computed: {
+    contactLink() {
+      return `mailto:${this.settings.contactEmail}`;
+    },
   },
 
   methods: {
@@ -117,6 +124,10 @@ export default {
         <skill-control :skills.sync='skills' />
 
         <item-control :items.sync='items' />
+      </div>
+
+      <div class='footer'>
+        To report bugs or ask any question, <a :href='contactLink'>contact us</a>.
       </div>
     </div>
   </div>
@@ -225,5 +236,11 @@ a:hover {
 
 .select-wrapper {
   width: 680px;
+}
+
+.footer {
+  margin-bottom: 40px;
+  color: #777777;
+  font-style: italic;
 }
 </style>
