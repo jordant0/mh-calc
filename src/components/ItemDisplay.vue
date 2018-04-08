@@ -52,13 +52,15 @@ export default {
 </script>
 
 <template>
-  <div class='item-display-item bordered-box dashed-border'>
+  <div class='skill-item-display'>
     <div class='item-header'>
-      <div class='item-name'>
+      <div class='skill-item-name'>
         {{ itemName }}
       </div>
 
-      <a class='remove-link' href='#' @click.prevent='removeItem'>x</a>
+      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeItem'>
+        <span class='glyphicon glyphicon-remove'></span>
+      </a>
     </div>
 
     <div v-if='enableActivationEdit' class='input-item item-edit'>
@@ -83,31 +85,9 @@ export default {
 </template>
 
 <style>
-.item-display-item {
-  width: 406px;
-  box-sizing: border-box;
-  padding: 16px 24px;
-  margin: 0;
-  margin-right: 30px;
-  margin-top: 24px;
-  position: relative;
-}
-
-.remove-link:hover {
-  border-color: #efefef;
-}
-
-.item-name {
-  font-weight: 600;
-  color: #24d0f7;
-  font-size: 20px;
-  text-align: left;
-  margin-bottom: 12px;
-}
-
 .item-edit {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
@@ -116,7 +96,7 @@ export default {
 }
 
 .item-edit .input-field {
-  width: 50px;
+  width: 55px;
 }
 
 .activation-input {

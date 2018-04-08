@@ -77,10 +77,16 @@ export default {
 </script>
 
 <template>
-  <div class='skill-controls bordered-box'>
-    <skill-selector @skill-added='addSkill' />
+  <div class='skill-controls skill-item-control'>
+    <div class='skill-item-header'>
+      <div class='skill-item-header_title'>
+        Active Skills:
+      </div>
 
-    <div class='skills-display'>
+      <skill-selector @skill-added='addSkill' />
+    </div>
+
+    <div class='skills-items-display'>
       <skill-display
         v-for='skill in skills'
         :key='skill.id'
@@ -92,11 +98,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style>
-.skills-display {
-  display: flex;
-  flex-wrap: wrap;
-  margin-right: -20px;
-}
-</style>

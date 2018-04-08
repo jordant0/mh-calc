@@ -50,13 +50,15 @@ export default {
 </script>
 
 <template>
-  <div class='skill-display-item bordered-box dashed-border'>
+  <div class='skill-item-display'>
     <div class='skill-header'>
-      <div class='skill-name'>
+      <div class='skill-item-name'>
         {{ skillName }}
       </div>
 
-      <a class='remove-link' href='#' @click.prevent='removeSkill'>x</a>
+      <a class='icon-action skill-item-remove' href='#' @click.prevent='removeSkill'>
+        <span class='glyphicon glyphicon-remove'></span>
+      </a>
     </div>
 
     <div class='skill-edit'>
@@ -87,28 +89,6 @@ export default {
 </template>
 
 <style>
-.skill-display-item {
-  width: 406px;
-  box-sizing: border-box;
-  padding: 16px 24px;
-  margin: 0;
-  margin-right: 30px;
-  margin-top: 24px;
-  position: relative;
-}
-
-.remove-link:hover {
-  border-color: #efefef;
-}
-
-.skill-name {
-  font-weight: 600;
-  color: #24d0f7;
-  font-size: 20px;
-  text-align: left;
-  margin-bottom: 12px;
-}
-
 .skill-edit {
   display: flex;
   justify-content: space-between;
@@ -120,7 +100,7 @@ export default {
 }
 
 .skill-edit .input-field {
-  width: 50px;
+  width: 55px;
 }
 
 .activation-input {

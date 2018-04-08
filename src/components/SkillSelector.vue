@@ -29,10 +29,10 @@ export default {
 </script>
 
 <template>
-  <div class='skill-selector'>
-    <div class='skills-input input-item select-wrapper'>
-      <span class='input-label'>
-        Select skills
+  <div class='skill-item-selector'>
+    <div class='skill-item-input input-item select-wrapper'>
+      <span class='skill-item-label input-label'>
+        Add skill
       </span>
 
       <vue-select

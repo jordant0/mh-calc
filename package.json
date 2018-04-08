@@ -15,6 +15,7 @@
     "select2": "^4.0.6-rc.1",
     "stickyfilljs": "^2.0.3",
     "vue": "^2.5.2",
+    "vue-meta": "^1.5.0",
     "vue-router": "^3.0.1",
     "vue-select": "^2.4.0"
   },

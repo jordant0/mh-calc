@@ -66,14 +66,20 @@ export default {
 </script>
 
 <template>
-  <div class='item-controls bordered-box'>
-    <item-selector @item-added='addItem' />
+  <div class='item-controls skill-item-control'>
+    <div class='skill-item-header'>
+      <div class='skill-item-header_title'>
+        Active Items/Buffs:
+      </div>
+
+      <item-selector @item-added='addItem' />
+    </div>
 
     <div class='items-notice'>
       Note: Items/buffs in the same category will override each other. The strongest effect will be kept.
     </div>
 
-    <div class='items-display'>
+    <div class='skills-items-display'>
       <item-display
         v-for='item in items'
         :key='item.id'
@@ -88,19 +94,13 @@ export default {
 <style>
 .item-controls {
   margin-top: 40px;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 .items-notice {
   text-align: left;
   color: #777777;
   font-style: italic;
-  margin-top: 8px;
-}
-
-.items-display {
-  display: flex;
-  flex-wrap: wrap;
-  margin-right: -20px;
+  margin: 15px 0px;
 }
 </style>

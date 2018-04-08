@@ -1,5 +1,4 @@
 <script>
-import StickyFill from 'stickyfilljs'
 import SaveModal from '@/components/SaveModal'
 import SaveDisplay from '@/components/SaveDisplay'
 import JsonProcessor from '@/mixins/JsonProcessor'
@@ -25,7 +24,8 @@ export default {
     settings: {
       type: Object,
       default: {}
-    }
+    },
+    shown: Boolean,
   },
 
   data() {
@@ -46,9 +46,14 @@ export default {
     this.createSaveFile();
   },
 
-  mounted() {
-    var elements = document.querySelectorAll('.save-area');
-    StickyFill.add(elements);
+  computed: {
+    classNames() {
+      var classNames = ['save-area'];
+      if(this.shown) {
+        classNames.push('shown')
+      }
+      return classNames;
+    }
   },
 
   methods: {
@@ -155,38 +160,54 @@ export default {
           console.log(e);
         }
       }
-    }
+    },
+
+    toggleSaveSection() {
+      this.$emit('toogle-save-section');
+    },
   }
 }
 </script>
 
 <template>
-  <span class='save-area'>
-    <div class='save-manager bordered-box'>
-      <div class='save-actions'>
-        <a class='clear-saves-links' href='#' @click.prevent='clearAllSaves'>Clear All Saves</a>
-        <a class='button' href='#' @click.prevent='getSaveName'>Save</a>
+  <span :class='classNames'>
+    <div class='save-manager'>
+      <div class='save-top-section'>
+        <div class='save-actions save-header'>
+          <a class='button green-button bold-button' href='#' @click.prevent='getSaveName'>
+            New Save
+          </a>
+          <a href='#' class='close-save-link' @click.prevent='toggleSaveSection'>
+            <span class='glyphicon glyphicon-remove'></span>
+          </a>
+        </div>
+
+        <div class='saves-display'>
+          <save-display
+            v-for='(save, index) in saves'
+            :key='index'
+            :save='save'
+            :index='index'
+            :settings='settings'
+            :current-final-raw='finalRaw'
+            @remove-save='removeSave'
+            @restore-save='restoreSave'
+            @overrite-save='overwriteSave'
+          />
+        </div>
       </div>
 
-      <div class='saves-display'>
-        <save-display
-          v-for='(save, index) in saves'
-          :key='index'
-          :save='save'
-          :index='index'
-          :settings='settings'
-          :current-final-raw='finalRaw'
-          @remove-save='removeSave'
-          @restore-save='restoreSave'
-          @overrite-save='overwriteSave'
-        />
-      </div>
+      <div class='save-bottom-section'>
+        <div class='save-actions save-export-import'>
+          <a class='button' :href='savesFile' download='MHCalc-Saves.txt'>Export</a>
+          <div class='import-wrapper'>
+            <a class='button' href='#' @click.prevent='triggerSaveImport'>Import</a>
+            <input @change='importSave' class='saves-import' name='saves' type='file' accept='text/plain'>
+          </div>
+        </div>
 
-      <div class='save-export-import'>
-        <a class='button' :href='savesFile' download='MHCalc-Saves.txt'>Export Saves</a>
-        <div class='import-wrapper'>
-          <a class='button' href='#' @click.prevent='triggerSaveImport'>Import Saves</a>
-          <input @change='importSave' class='saves-import' name='saves' type='file' accept='text/plain'>
+        <div class='save-actions'>
+          <a class='clear-saves-links' href='#' @click.prevent='clearAllSaves'>Clear All</a>
         </div>
       </div>
     </div>
@@ -201,15 +222,39 @@ export default {
 </template>
 
 <style>
+.save-area {
+  width: 0;
+  transition: width 0.5s;
+  overflow: hidden;
+}
+
+.close-save-link {
+  font-size: 24px;
+  color: #23527c;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.save-area.shown {
+  width: 320px;
+}
+
 .save-manager {
-  width: 25%;
-  float: right;
-  box-sizing: border-box;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 24px;
-  max-height: calc(100vh - 150px);
+  width: 320px;
+  height: 100vh;
+  top: 0;
+  max-height: 100vh;
   overflow-y: auto;
+  background-color: white;
+  background-color: #ebf0f6;
+  box-sizing: border-box;
+  position: relative;
+  padding: 20px;
+  border-left: 6px solid #1f9e75;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .save-actions {
@@ -221,15 +266,20 @@ export default {
   font-size: 14px;
 }
 
-.save-export-import {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 40px;
+.saves-display {
+  margin: 20px 0;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
 }
 
-.import-wrapper {
-  position: relative;
+.save-bottom-section {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.save-export-import {
+  justify-content: normal
 }
 
 .saves-import {
@@ -240,7 +290,18 @@ export default {
   opacity: 0;
 }
 
+.import-wrapper {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  margin-left: 12px;
+}
+
 .import-wrapper:hover, .saves-import:hover {
   cursor: pointer;
+}
+
+.import-wrapper:hover .button, .saves-import:hover .button {
+  background-color: #cccccc;
 }
 </style>

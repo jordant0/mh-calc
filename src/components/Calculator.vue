@@ -469,7 +469,7 @@ export default {
 </script>
 
 <template>
-  <div class='damage-display bordered-box'>
+  <div class='damage-display'>
     <div class='damage-item damage-detail'>
       <span class='damage-label'>Fixed raw:</span>
       <span class='damage-number'>{{ displayFixeRaw }}</span>
@@ -493,12 +493,6 @@ export default {
 </template>
 
 <style>
-.damage-display {
-  max-width: 320px;
-  flex: 1;
-  margin-bottom: auto;
-}
-
 .damage-item {
   display: flex;
   justify-content: space-between;
@@ -521,7 +515,7 @@ export default {
 }
 
 .damage-final .damage-number {
-  color: #62ff00;
+  color: white;
 }
 
 .affinity-overflow {

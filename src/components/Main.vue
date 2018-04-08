@@ -11,6 +11,12 @@ const LOCAL_STORAGE_KEY = 'MhCalc-SavedData';
 export default {
   name: 'Main',
 
+  metaInfo: {
+    link: [
+      { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' },
+    ]
+  },
+
   mixins: [
     JsonProcessor
   ],
@@ -68,9 +74,10 @@ export default {
         debug: this.$route.query.debug === 'true',
         verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '0.4.2',
+        version: '1.0.0',
         contactEmail: 'mhw.calc.dev@gmail.com',
       },
+      showSaveSection: false,
     }
   },
 
@@ -84,31 +91,36 @@ export default {
     updatedFinalRaw(value) {
       this.finalRaw = value;
     },
+
+    toggleSaveSection() {
+      this.showSaveSection = !this.showSaveSection;
+    },
   }
 }
 </script>
 
 <template>
   <div class='mh-calc'>
-    <h1>
-      MHW Damage Calculator
-      <div class='version-number'>
-        v{{ settings.version }}
+    <div class='body-section'>
+      <div class='header'>
+        <div class='header-info'>
+          <div class='header-title'>
+            MHW Damage Calculator
+          </div>
+          <div class='version-number'>
+            v{{ settings.version }}
+          </div>
+        </div>
+
+        <div class='header-icon'>
+          <a href='#' class='setting-link' @click.prevent='toggleSaveSection' title='Manage saves'>
+            <span class='glyphicon glyphicon-cog'></span>
+          </a>
+        </div>
       </div>
-    </h1>
 
-    <div class='main-content'>
-      <save-manager
-        :weapon.sync='weapon'
-        :skills.sync='skills'
-        :items.sync='items'
-        :settings='settings'
-        :final-raw='finalRaw'
-        :saves.sync='saves'
-      />
-
-      <div class='current-data'>
-        <div class='general-data'>
+      <div class='body-content'>
+        <div class='left-sidebar'>
           <weapon-input :weapon='weapon' />
 
           <calculator
@@ -121,58 +133,108 @@ export default {
           />
         </div>
 
-        <skill-control :skills.sync='skills' />
+        <div class='main-content'>
+          <div class='current-data'>
+            <skill-control :skills.sync='skills' />
 
-        <item-control :items.sync='items' />
-      </div>
+            <item-control :items.sync='items' />
+          </div>
 
-      <div class='footer'>
-        To report bugs or ask any question, <a :href='contactLink'>contact us</a>.
+          <div class='footer'>
+            To report bugs or ask any question, <a :href='contactLink'>contact us</a>.
+          </div>
+        </div>
       </div>
     </div>
+
+    <transition name='slide'>
+      <save-manager
+        :weapon.sync='weapon'
+        :skills.sync='skills'
+        :items.sync='items'
+        :settings='settings'
+        :final-raw='finalRaw'
+        :saves.sync='saves'
+        :shown='showSaveSection'
+        @toogle-save-section='toggleSaveSection'
+      />
+    </transition>
   </div>
 </template>
 
 <style>
 .mh-calc {
-  max-width: 1400px;
-  margin: auto;
+  display: flex;
+  height: 100vh;
 }
 
-h1 {
-  margin: 0;
-  padding-top: 20px;
-  color: #e6d027;
+.header {
+  background-color: #212121;
+  top: 0;
+  color: white;
+  display: flex;
+  z-index: 10;
+  justify-content: space-between;
+}
+
+.body-section {
+  flex: 1;
+}
+
+.body-content {
+  height: calc(100vh - 49px);
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.header-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.header-icon {
+  padding: 0 20px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.setting-link, .setting-link:hover, .setting-link:focus {
+  color: white;
 }
 
 .version-number {
   font-weight: 400;
   font-size: 12px;
   color: #777777;
-  margin-top: 10px;
 }
 
-.general-data {
+.left-sidebar {
+  background-color: #1f9e75;
+  top: 45px;
+  float: left;
+  width: 300px;
+  box-sizing: border-box;
+  padding: 20px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  height: 100%;
 }
 
-.bordered-box {
-  border: 3px solid #c78306;
-  border-radius: 5px;
-  padding: 24px 32px;
-  margin: 0 20px;
-}
-
-.dashed-border {
-  border: 1px dashed #b9b9b5;
-  border-radius: 2px;
-}
-
-.current-data {
-  width: 70%;
+.main-content {
+  margin-left: 300px;
+  overflow: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .input-item {
@@ -189,18 +251,9 @@ h1 {
 
 .input-field {
   padding: 4px 5px;
-  border-radius: 2px;
-  border: 0;
+  border-radius: 3px;
+  border: 1px solid #d6d4d4;
   width: 80px;
-}
-
-a {
-  color: #bbbbbb;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #efefef;
 }
 
 .button {
@@ -213,34 +266,114 @@ a:hover {
 
 .button:hover {
   background-color: #cccccc;
+  text-decoration: none;
   color: black;
 }
 
-.remove-link {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+.button.green-button {
+  color: white;
+  background-color: #1f9e75;
+  border-color: #1f9e75;
+}
 
-  display: inline-block;
-  height: 20px;
-  width: 20px;
-  border: 1px solid #bbbbbb;
-  border-radius: 50%;
+.button.green-button:hover {
+  color: white;
+  background-color: #23b384;
+  border-color: #23b384;
+  text-decoration: none;
+}
+
+.button.bold-button {
+  font-weight: 600;
+}
+
+.icon-action {
+  display: flex;
+  font-size: 20px;
+  color: #aba7a7;
+}
+
+.icon-action:hover, .icon-action:focus {
+  text-decoration: none;
+  color: black;
+}
+
+.icon-action .glyphicon {
+  top: 0;
 }
 
 .v-select .dropdown-toggle {
-  border-color: white !important;
-  background-color: white !important;
   width: 500px;
 }
 
 .select-wrapper {
-  width: 680px;
+  width: 640px;
+}
+
+.skill-item-control {
+  margin: 20px 30px;
+}
+
+.skill-item-header {
+  text-align: left;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #d6d4d4;
+  margin-bottom: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-item-header_title {
+  font-size: 22px;
+}
+
+.skill-item-input {
+  padding: 5px 0;
+}
+
+.skill-item-label {
+  font-weight: 400;
+}
+
+.skills-items-display {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.skill-item-display {
+  width: 375px;
+  box-sizing: border-box;
+  padding: 16px 20px;
+  margin: 0;
+  position: relative;
+  border: 1px solid #d6d4d4;
+  border-left: 5px solid #d6d4d4;
+  margin: 6px;
+  position: relative;
+}
+
+.skill-item-display:hover {
+  border-left: 5px solid #f67519;
+}
+
+.skill-item-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.skill-item-name {
+  color: #1f9e75;
+  font-size: 18px;
+  text-align: left;
+  margin-bottom: 12px;
 }
 
 .footer {
-  margin-bottom: 40px;
+  padding: 15px;
   color: #777777;
   font-style: italic;
+  text-align: right;
 }
 </style>

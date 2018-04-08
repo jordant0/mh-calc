@@ -17,7 +17,6 @@ html {
 
 body {
   margin: 0;
-  background-color: #1d2120;
 }
 
 #app {
@@ -26,6 +25,5 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   text-align: center;
-  color: #dfeae9;
 }
 </style>
