@@ -18,6 +18,7 @@ export default {
 
   props: {
     skills: Array,
+    weapon: Object,
   },
 
   methods: {
@@ -91,6 +92,7 @@ export default {
         v-for='skill in skills'
         :key='skill.id'
         :skill='skill'
+        :weapon='weapon'
         @skill-level-update='updateSkillLevel'
         @skill-level-activation='updateSkillActivation'
         @skill-remove='removeSkill'

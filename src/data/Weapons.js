@@ -10,6 +10,7 @@ export const Weapons = {
   3: {
     name: 'Sword & Shield',
     category: 'blademaster',
+    className: 'sword-and-shield',
   },
   4: {
     name: 'Dual Blades',
@@ -20,7 +21,7 @@ export const Weapons = {
     category: 'blademaster',
   },
   6: {
-    name: 'Hunting Hon',
+    name: 'Hunting Horn',
     category: 'blademaster',
   },
   7: {

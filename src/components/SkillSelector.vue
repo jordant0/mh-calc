@@ -1,29 +1,25 @@
 <script>
-import VueSelect from 'vue-select'
-import OptionsForSelect from '@/mixins/OptionsForSelect'
+import Selector from '@/components/Selector'
 import { SkillList } from '@/data/SkillList'
 
 export default {
   name: 'SkillSelector',
 
-  mixins: [
-    OptionsForSelect,
-  ],
-
   components: {
-    VueSelect,
+    Selector,
+  },
+
+  watch: {
+    selected() {
+      this.$emit('skill-added', this.selected);
+    }
   },
 
   data() {
     return {
-      skillList: this.convertToOptions(SkillList),
+      selected: null,
+      skillList: SkillList,
     }
-  },
-
-  methods: {
-    skillSelected(option) {
-      this.$emit('skill-added', option.value);
-    },
   },
 }
 </script>
@@ -35,10 +31,10 @@ export default {
         Add skill
       </span>
 
-      <vue-select
-        placeholder='Type to search...'
+      <selector
+        class='skill-item-selector'
+        :value.sync='selected'
         :options='skillList'
-        @input='skillSelected'
       />
     </div>
   </div>

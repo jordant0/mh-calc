@@ -6,6 +6,7 @@ export default {
 
   props: {
     skill: Object,
+    weapon: Object,
   },
 
   computed: {
@@ -24,6 +25,18 @@ export default {
     enableActivationEdit() {
       return !this.skillData.fixedActivation;
     },
+
+    displayClass() {
+      var classNames = ['skill-item-display'];
+      if(this.showWarning) {
+        classNames.push('inactive');
+      }
+      return classNames;
+    },
+
+    showWarning() {
+      return this.skill.id === 11 && !this.weapon.elementless; // Non-elemental Boost
+    }
   },
 
   methods: {
@@ -50,7 +63,7 @@ export default {
 </script>
 
 <template>
-  <div class='skill-item-display'>
+  <div :class='displayClass'>
     <div class='skill-header'>
       <div class='skill-item-name'>
         {{ skillName }}
@@ -85,10 +98,18 @@ export default {
         </div>
       </div>
     </div>
+
+    <div v-if='showWarning' class='skill-warning'>
+      Weapon has an active element/status.
+    </div>
   </div>
 </template>
 
 <style>
+.skill-item-display.inactive .skill-item-name {
+  color: #d80000;
+}
+
 .skill-edit {
   justify-content: space-between;
 }
@@ -103,5 +124,12 @@ export default {
 
 .activation-input {
   margin-right: 5px;
+}
+
+.skill-warning {
+  margin-top: 12px;
+  font-style: italic;
+  font-size: 14px;
+  color: #d80000;
 }
 </style>

@@ -13,8 +13,10 @@ export default {
   name: 'Main',
 
   metaInfo: {
+     title: 'MHW Damage Calculator',
     link: [
       { rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' },
+      { rel: 'shortcut icon', type: 'image/png', href: '/static/favicon.png' },
     ]
   },
 
@@ -60,6 +62,7 @@ export default {
   data() {
     return {
       weapon: {
+        id: 0,
         type: 1,
         raw: 200,
         affinity: 0,
@@ -67,6 +70,10 @@ export default {
         coating: 2, // Power
         activation: 100,
         augments: [0, 0, 0],
+        augmentSlots: 3,
+        maxSharpness: 5,
+        maxCoating: 2,
+        elementless: true,
       },
       skills: [],
       items: [],
@@ -76,7 +83,7 @@ export default {
         debug: this.$route.query.debug === 'true',
         verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '1.0.2',
+        version: '2.0.0',
         contactEmail: 'mhw.calc.dev@gmail.com',
       },
       showSaveSection: false,
@@ -137,7 +144,7 @@ export default {
 
         <div class='main-content'>
           <div class='current-data'>
-            <skill-control :skills.sync='skills' />
+            <skill-control :skills.sync='skills' :weapon='weapon' />
 
             <item-control :items.sync='items' />
           </div>
@@ -218,6 +225,7 @@ export default {
 }
 
 .left-sidebar {
+  color: black;
   background-color: #1f9e75;
   top: 45px;
   float: left;
@@ -228,6 +236,14 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+}
+
+.left-sidebar .vue-select-input {
+  border: 0;
+}
+
+.left-sidebar .vue-select-dropdown {
+  top: 37px;
 }
 
 .main-content {
@@ -304,16 +320,12 @@ export default {
   top: 0;
 }
 
-.v-select .dropdown-toggle {
-  width: 500px;
-}
-
-.select-wrapper {
-  width: 640px;
-}
-
 .skill-item-control {
   margin: 20px 30px;
+}
+
+.skill-item-selector.vue-selector {
+  width: 300px;
 }
 
 .skill-item-header {

@@ -1,4 +1,6 @@
 <script>
+import Selector from '@/components/Selector'
+import WeaponTypeData from '@/mixins/WeaponTypeData'
 import { Weapons } from '@/data/Weapons'
 import { Sharpness } from '@/data/Sharpness'
 import { Coatings } from '@/data/Coatings'
@@ -7,17 +9,62 @@ import { Augments } from '@/data/Augments'
 export default {
   name: 'WeaponInput',
 
+  mixins: [
+    WeaponTypeData
+  ],
+
+  components: {
+    Selector,
+  },
+
   props: {
     weapon: Object,
   },
 
   data() {
     return {
-      weaponList: Weapons,
+      weaponTypeList: Weapons,
       sharpnessList: Sharpness,
       coatingList: Coatings,
       augmentList: Augments,
     }
+  },
+
+  watch: {
+    'weapon.type': function() {
+      this.weapon.id = 0;
+    },
+
+    'weapon.id': function() {
+      if(this.weapon.id === 0) {
+        this.weapon.maxSharpness = 5;
+        this.weapon.maxCoating = 2;
+        this.weapon.augmentSlots = 3;
+      }
+      else {
+        var data = this.weaponList[this.weapon.id];
+        this.weapon.raw = data.raw;
+        this.weapon.affinity = data.affinity;
+        if(data.sharpness) {
+          this.weapon.sharpness = data.sharpness.base;
+          this.weapon.maxSharpness = data.sharpness.max;
+        }
+        if(data.coating) {
+          this.weapon.coating = data.coating;
+          this.weapon.maxCoating = data.coating;
+        }
+
+        this.weapon.elementless = !data.element || data.element.hidden;
+
+        if(data.augmentable) {
+          this.weapon.augmentSlots = Math.min(Math.max(9 - data.rarity, 0), 3);
+        }
+        else {
+          this.weapon.augmentSlots = 0;
+        }
+        this.weapon.activation = 100;
+      }
+    },
   },
 
   computed: {
@@ -36,6 +83,38 @@ export default {
     showActivation() {
       return this.showSharpness || this.showCoating;
     },
+
+    weaponList() {
+      return this.weaponData[this.weapon.type];
+    },
+
+    augmentIterator() {
+      return new Array(this.weapon.augmentSlots);
+    },
+
+    allowedSharpness() {
+      var result = {};
+
+      for(var key in this.sharpnessList) {
+        if(key <= this.weapon.maxSharpness) {
+          result[key] = this.sharpnessList[key];
+        }
+      }
+
+      return result;
+    },
+
+    allowedCoatings() {
+      var result = {};
+
+      for(var key in this.coatingList) {
+        if(key <= this.weapon.maxCoating) {
+          result[key] = this.coatingList[key];
+        }
+      }
+
+      return result;
+    },
   },
 
   methods: {
@@ -50,22 +129,32 @@ export default {
   <div class='weapon-info'>
     <form class='weapon-input'>
       <div class='input-item'>
-        <span class='input-label'>Weapon:</span>
-        <select class='input-field type-field' v-model='weapon.type'>
-          <option v-for='(info, id) in weaponList' :value='id'>
-            {{ info.name }}
-          </option>
-        </select>
+        <span class='input-label weapon-label'>Weapon</span>
+
+        <selector
+          class='weapon-type-selector'
+          placeholder='Weapon type'
+          :value.sync='weapon.type'
+          :options='weaponTypeList'
+        />
       </div>
+
+      <selector
+        class='weapon-selector'
+        placeholder='Find weapon...'
+        :value.sync='weapon.id'
+        :options='weaponList'
+      />
 
       <div class='input-item'>
         <span class='input-label'>Raw</span>
-        <input class='input-field' type='number' v-model.number='weapon.raw' />
+        <input v-if='weapon.id === 0' class='input-field' type='number' v-model.number='weapon.raw' />
+        <span v-if='weapon.id !== 0' class='input-field text-display'>{{ weapon.raw }}</span>
       </div>
 
       <div class='input-item'>
         <span class='input-label'>Affinity</span>
-        <div>
+        <div v-if='weapon.id === 0'>
           <input
             class='affinity-input input-field'
             type='number'
@@ -74,29 +163,36 @@ export default {
             :max='100'
           />%
         </div>
+        <span v-if='weapon.id !== 0' class='input-field text-display'>{{ weapon.affinity }}%</span>
       </div>
       <a class='convert-to-negative' href='#' @click.prevent='flipSign'>Flip sign</a>
 
-      <div v-if='showSharpness' class='input-item'>
+      <div v-if='showSharpness' class='input-item sharpness-input'>
         <span class='input-label'>Sharpness</span>
-        <select class='input-field' v-model='weapon.sharpness'>
-          <option v-for='(info, id) in sharpnessList' :value='id'>
-            {{ info.name }}
-          </option>
-        </select>
+
+        <selector
+          class='sharpness-selector'
+          placeholder='Sharpness'
+          :value.sync='weapon.sharpness'
+          :options='allowedSharpness'
+          max-height='230px'
+        />
       </div>
 
       <div v-if='showCoating' class='input-item'>
-        <span class='input-label'>Coating</span>
-        <select class='input-field coating-field' v-model='weapon.coating'>
-          <option v-for='(info, id) in coatingList' :value='id'>
-            {{ info.name }}
-          </option>
-        </select>
+        <span class='input-label coating-label'>Coating</span>
+
+        <selector
+          class='coating-selector'
+          placeholder='Coating'
+          :value.sync='weapon.coating'
+          :options='allowedCoatings'
+          max-height='120px'
+        />
       </div>
 
       <div v-if='showActivation' class='input-item'>
-        <span class='input-label'>Activation:</span>
+        <span class='input-label'>Activation</span>
         <div>
           <input
             class='input-field activation-input'
@@ -108,17 +204,17 @@ export default {
         </div>
       </div>
 
-      <div class='weapon-argments input-item'>
+      <div v-if='weapon.augmentSlots > 0' class='weapon-argments input-item'>
         <span class='input-label'>Augments</span>
-        <select
-          v-for='(augment, index) in weapon.augments'
-          class='input-field'
-          v-model='weapon.augments[index]'
-        >
-          <option v-for='(id, name) in augmentList' :value='id'>
-            {{ name }}
-          </option>
-        </select>
+        <selector
+          v-for='(dummy, index) in augmentIterator'
+          :key='index'
+          class='augment-selector'
+          placeholder='Augment'
+          :value.sync='weapon.augments[index]'
+          :options='augmentList'
+          max-height='120px'
+        />
       </div>
     </form>
   </div>
@@ -129,8 +225,226 @@ export default {
   width: 145px;
 }
 
+.weapon-label {
+  margin-right: 10px;
+}
+
 .weapon-info .input-field {
   border: 0;
+}
+
+.coating-field {
+  width: 120px;
+}
+
+.affinity-input, .activation-input {
+  margin-right: 5px;
+  width: 62px;
+}
+
+.input-field.text-display {
+  text-align: right;
+  font-weight: 600;
+}
+
+.convert-to-negative {
+  font-size: 12px;
+  text-align: right;
+  display: block;
+  margin-left: auto;
+  width: 122px;
+  margin-bottom: 4px;
+}
+
+.weapon-selector.vue-selector {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.weapon-selector .vue-select-input {
+  text-align: center;
+}
+
+.weapon-selector .vue-select-display.custom {
+  font-style: italic;
+}
+
+.weapon-type-selector .vue-select-display {
+  position: relative;
+}
+
+.weapon-type-selector .vue-select-option .vue-select-option_link,
+.weapon-type-selector .vue-select-display .vue-select-input {
+  padding-left: 42px;
+  text-align: center;
+}
+
+.weapon-type-selector .vue-select-display:before {
+  content: '';
+  height: 30px;
+  width: 30px;
+  left: 7px;
+  top: 3px;
+  position: absolute;
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+.weapon-type-selector .vue-select-display.great-sword:before {
+  background-image: url('./../assets/weapon-icons/great-sword.png');
+}
+
+.weapon-type-selector .vue-select-display.long-sword:before {
+  background-image: url('./../assets/weapon-icons/long-sword.png');
+}
+
+.weapon-type-selector .vue-select-display.sword-and-shield:before {
+  background-image: url('./../assets/weapon-icons/sword-and-shield.png');
+}
+
+.weapon-type-selector .vue-select-display.dual-blades:before {
+  background-image: url('./../assets/weapon-icons/dual-blades.png');
+}
+
+.weapon-type-selector .vue-select-display.hammer:before {
+  background-image: url('./../assets/weapon-icons/hammer.png');
+}
+
+.weapon-type-selector .vue-select-display.hunting-horn:before {
+  background-image: url('./../assets/weapon-icons/hunting-horn.png');
+}
+
+.weapon-type-selector .vue-select-display.lance:before {
+  background-image: url('./../assets/weapon-icons/lance.png');
+}
+
+.weapon-type-selector .vue-select-display.gunlance:before {
+  background-image: url('./../assets/weapon-icons/gunlance.png');
+}
+
+.weapon-type-selector .vue-select-display.switch-axe:before {
+  background-image: url('./../assets/weapon-icons/switch-axe.png');
+}
+
+.weapon-type-selector .vue-select-display.charge-blade:before {
+  background-image: url('./../assets/weapon-icons/charge-blade.png');
+}
+
+.weapon-type-selector .vue-select-display.insect-glaive:before {
+  background-image: url('./../assets/weapon-icons/insect-glaive.png');
+}
+
+.weapon-type-selector .vue-select-display.light-bowgun:before {
+  background-image: url('./../assets/weapon-icons/light-bowgun.png');
+}
+
+.weapon-type-selector .vue-select-display.heavy-bowgun:before {
+  background-image: url('./../assets/weapon-icons/heavy-bowgun.png');
+}
+
+.weapon-type-selector .vue-select-display.bow:before {
+  background-image: url('./../assets/weapon-icons/bow.png');
+}
+
+.sharpness-input {
+  flex-wrap: wrap;
+}
+
+.vue-selector.sharpness-selector {
+  width: 185px;
+  margin-lefT: auto;
+  margin-top: 8px;
+}
+
+.sharpness-selector .vue-select-display {
+  position: relative;
+}
+
+.sharpness-selector .vue-select-option .vue-select-option_link,
+.sharpness-selector .vue-select-display .vue-select-input {
+  padding-left: 104px;
+  text-align: left;
+}
+
+.sharpness-selector .vue-select-display:before {
+  content: '';
+  height: 16px;
+  width: 84px;
+  left: 7px;
+  top: 9px;
+  position: absolute;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+}
+
+.sharpness-selector .vue-select-display.red:before {
+  background-image: url('./../assets/sharpness/red.png');
+}
+
+.sharpness-selector .vue-select-display.orange:before {
+  background-image: url('./../assets/sharpness/orange.png');
+}
+
+.sharpness-selector .vue-select-display.yellow:before {
+  background-image: url('./../assets/sharpness/yellow.png');
+}
+
+.sharpness-selector .vue-select-display.green:before {
+  background-image: url('./../assets/sharpness/green.png');
+}
+
+.sharpness-selector .vue-select-display.blue:before {
+  background-image: url('./../assets/sharpness/blue.png');
+}
+
+.sharpness-selector .vue-select-display.white:before {
+  background-image: url('./../assets/sharpness/white.png');
+}
+
+.coating-label {
+  margin-right: 20px;
+}
+
+.coating-selector .vue-select-display {
+  position: relative;
+}
+
+.coating-selector .vue-select-option .vue-select-option_link,
+.coating-selector .vue-select-display .vue-select-input {
+  padding-left: 42px;
+  text-align: center;
+}
+
+.vue-selector.coating-selector {
+  width: 175px;
+}
+
+.coating-selector .vue-select-display:before {
+  content: '';
+  height: 25px;
+  width: 25px;
+  left: 7px;
+  top: 5px;
+  position: absolute;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+}
+
+.coating-selector .vue-select-display.none,
+.coating-selector .vue-select-display.none .vue-select-input {
+  font-style: italic;
+}
+
+.coating-selector .vue-select-display.none:before {
+  background-image: url('./../assets/coatings/empty-phial.png');
+}
+
+.coating-selector .vue-select-display.close-range:before {
+  background-image: url('./../assets/coatings/close-range.png');
+}
+
+.coating-selector .vue-select-display.power:before {
+  background-image: url('./../assets/coatings/power.png');
 }
 
 .weapon-argments {
@@ -147,30 +461,39 @@ export default {
   margin-bottom: 15px;
 }
 
-.weapon-argments .input-field {
+.augment-selector {
   width: 150px;
   margin-bottom: 15px;
 }
 
-.weapon-argments .input-field:last-child {
-  margin-bottom: 0;
+.augment-selector .vue-select_expand-icon {
+  right: 9px;
 }
 
-.coating-field {
-  width: 120px;
+.augment-selector .vue-select-option_link.vue-select-display,
+.augment-selector .vue-select_input-wrapper.vue-select-display .vue-select-input {
+  color: white;
+  letter-spacing: 2px;
+  padding: 2px;
+  border: 6px double white;
+  text-align: center;
 }
 
-.affinity-input, .activation-input {
-  margin-right: 5px;
-  width: 62px;
+.augment-selector .vue-select-option_link.vue-select-display.none,
+.augment-selector .vue-select_input-wrapper.vue-select-display.none .vue-select-input {
+  background-color: #3c3c3c;
+  border-color: #525252;
 }
 
-.convert-to-negative {
-  font-size: 12px;
-  text-align: right;
-  display: block;
-  margin-left: auto;
-  width: 122px;
-  margin-bottom: 4px;
+.augment-selector .vue-select-option_link.vue-select-display.attack,
+.augment-selector .vue-select_input-wrapper.vue-select-display.attack .vue-select-input {
+  background-color: #6f3535;
+  border-color: #a76262;
+}
+
+.augment-selector .vue-select-option_link.vue-select-display.affinity,
+.augment-selector .vue-select_input-wrapper.vue-select-display.affinity .vue-select-input {
+  background-color: #523067;
+  border-color: #8453a2;
 }
 </style>

@@ -255,7 +255,7 @@ export default {
 .save-final-raw:after {
   content: '';
   position: absolute;
-  top: 8px;
+  top: 10px;
   left: 3px;
 }
 

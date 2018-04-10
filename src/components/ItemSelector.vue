@@ -1,29 +1,25 @@
 <script>
-import VueSelect from 'vue-select'
-import OptionsForSelect from '@/mixins/OptionsForSelect'
+import Selector from '@/components/Selector'
 import { ItemList } from '@/data/ItemList'
 
 export default {
   name: 'ItemSelector',
 
-  mixins: [
-    OptionsForSelect,
-  ],
-
   components: {
-    VueSelect,
+    Selector,
+  },
+
+  watch: {
+    selected() {
+      this.$emit('item-added', this.selected);
+    }
   },
 
   data() {
     return {
-      itemList: this.convertToOptions(ItemList),
+      selected: null,
+      itemList: ItemList,
     }
-  },
-
-  methods: {
-    itemSelected(option) {
-      this.$emit('item-added', option.value);
-    },
   },
 }
 </script>
@@ -35,10 +31,10 @@ export default {
         Add item/buff
       </span>
 
-      <vue-select
-        placeholder='Type to search...'
+      <selector
+        class='skill-item-selector'
+        :value.sync='selected'
         :options='itemList'
-        @input='itemSelected'
       />
     </div>
   </div>

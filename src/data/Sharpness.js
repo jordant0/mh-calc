@@ -1,10 +1,10 @@
 export const Sharpness = {
   0: {
-    name: 'Orange',
+    name: 'Red',
     multiplier: 0.50,
   },
   1: {
-    name: 'Red',
+    name: 'Orange',
     multiplier: 0.75,
   },
   2: {

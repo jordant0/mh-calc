@@ -7,7 +7,6 @@ import { ItemList } from '@/data/ItemList'
 import { Sharpness } from '@/data/Sharpness'
 import { Weapons } from '@/data/Weapons'
 import { Coatings } from '@/data/Coatings'
-import { Augments } from '@/data/Augments'
 
 export default {
   name: 'Calculator',
@@ -32,6 +31,7 @@ export default {
   created() {
     this.specialSkills = {
       criticalBoost: 0,
+      nonElemBoost: 11,
     };
 
     this.categoriesQueue = [];
@@ -47,11 +47,11 @@ export default {
     },
 
     attackAugmentsBonus() {
-      return 5 * this.getAugmentCount(Augments['Attack']);
+      return 5 * this.getAugmentCount(1);
     },
 
     affinityAugmentsBonus() {
-      var count = this.getAugmentCount(Augments['Affinity']);
+      var count = this.getAugmentCount(2);
       if(count < 1) {
         return 0;
       }
@@ -64,7 +64,14 @@ export default {
     },
 
     weaponRaw() {
-      return this.weapon.raw + this.attackAugmentsBonus;
+      var raw = this.weapon.raw + this.attackAugmentsBonus,
+          skill = this.findSkill(this.specialSkills.nonElemBoost);
+
+      if(skill && this.weapon.elementless) {
+        raw *= 1.1;
+      }
+
+      return raw;
     },
 
     affinity() {
