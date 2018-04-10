@@ -165,7 +165,7 @@ export default {
         </div>
         <span v-if='weapon.id !== 0' class='input-field text-display'>{{ weapon.affinity }}%</span>
       </div>
-      <a class='convert-to-negative' href='#' @click.prevent='flipSign'>Flip sign</a>
+      <a v-if='weapon.id === 0' class='convert-to-negative' href='#' @click.prevent='flipSign'>Flip sign</a>
 
       <div v-if='showSharpness' class='input-item sharpness-input'>
         <span class='input-label'>Sharpness</span>
