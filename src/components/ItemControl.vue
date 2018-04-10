@@ -72,7 +72,7 @@ export default {
         Active Items/Buffs:
       </div>
 
-      <item-selector @item-added='addItem' />
+      <item-selector :items='items' @item-added='addItem' />
     </div>
 
     <div class='items-notice'>

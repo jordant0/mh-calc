@@ -88,6 +88,10 @@ export default {
       return result;
     },
 
+    noOptionFound() {
+      return !Object.keys(this.filteredOptions).length;
+    },
+
     inputClass() {
       var classNames = ['vue-select_input-wrapper'];
       if(this.showDropdown) {
@@ -168,6 +172,7 @@ export default {
       <input
         class='vue-select-input'
         spellcheck='false'
+        autocomplete='off'
         type='text'
         :value='inputValue'
         @input='query = inputValue = $event.target.value'
@@ -191,6 +196,9 @@ export default {
         :key='optionValue'
         @select-option='selectOption'
       />
+      <li v-if='noOptionFound' class='vue-select_no-result'>
+        No result found
+      </li>
     </ul>
   </div>
 </template>
@@ -254,5 +262,12 @@ export default {
   max-height: 0 !important;
   overflow: hidden;
   border: 0;
+}
+
+.vue-select_no-result {
+  padding: 8px;
+  text-align: center;
+  color: #cecece;
+  font-style: italic;
 }
 </style>

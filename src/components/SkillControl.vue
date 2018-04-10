@@ -84,7 +84,7 @@ export default {
         Active Skills:
       </div>
 
-      <skill-selector @skill-added='addSkill' />
+      <skill-selector :skills='skills' @skill-added='addSkill' />
     </div>
 
     <div class='skills-items-display'>

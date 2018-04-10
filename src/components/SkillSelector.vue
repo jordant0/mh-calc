@@ -9,9 +9,16 @@ export default {
     Selector,
   },
 
+  props: {
+    skills: Array
+  },
+
   watch: {
     selected() {
-      this.$emit('skill-added', this.selected);
+      if(this.selected || this.selected === 0) {
+        this.$emit('skill-added', this.selected);
+        this.selected = null;
+      }
     }
   },
 
@@ -21,6 +28,24 @@ export default {
       skillList: SkillList,
     }
   },
+
+  computed: {
+    skillIds() {
+      return this.skills.map(skill => skill.id.toString());
+    },
+
+    filteredList() {
+      var result = {};
+
+      for(var key in this.skillList) {
+        if(this.skillIds.indexOf(key) === -1) {
+          result[key] = this.skillList[key];
+        }
+      }
+
+      return result;
+    },
+  }
 }
 </script>
 
@@ -34,7 +59,7 @@ export default {
       <selector
         class='skill-item-selector'
         :value.sync='selected'
-        :options='skillList'
+        :options='filteredList'
       />
     </div>
   </div>
