@@ -263,7 +263,7 @@ export default {
 
   methods: {
     getAugmentCount(augment) {
-      return this.weapon.augments.filter(x => x === augment).length;
+      return this.weapon.augments.slice(0, this.weapon.augmentSlots).filter(x => x === augment).length;
     },
 
     convertToDecimal(num, size) {
