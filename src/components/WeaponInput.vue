@@ -245,6 +245,8 @@ export default {
 .input-field.text-display {
   text-align: right;
   font-weight: 600;
+  border: 0;
+  background-color: transparent;
 }
 
 .convert-to-negative {
@@ -500,6 +502,10 @@ export default {
 @media screen and (max-width: 1000px) {
   .weapon-info .input-field {
     border: 1px solid #d6d4d4;
+  }
+
+  .input-field.text-display {
+    border: 0;
   }
 }
 </style>
