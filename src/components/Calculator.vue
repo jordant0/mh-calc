@@ -527,4 +527,24 @@ export default {
 .affinity-overflow {
   color: #d80000;
 }
+
+@media screen and (max-width: 1000px) {
+  .damage-display {
+    background-color: #1f9e75;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 12px 16px;
+    z-index: 11;
+  }
+
+  .damage-detail {
+    display: none;
+  }
+
+  .damage-final {
+    margin: 0;
+  }
+}
 </style>

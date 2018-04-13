@@ -84,7 +84,7 @@ export default {
         </select>
       </div>
 
-      <div v-if='enableActivationEdit' class='input-item'>
+      <div v-if='enableActivationEdit' class='input-item skill-activation-input'>
         <span class='input-label'>Activation:</span>
         <div>
           <input
@@ -131,5 +131,11 @@ export default {
   font-style: italic;
   font-size: 14px;
   color: #d80000;
+}
+
+@media screen and (max-width: 1000px) {
+  .skill-edit .input-label {
+    margin-right: 12px;
+  }
 }
 </style>

@@ -83,7 +83,7 @@ export default {
         debug: this.$route.query.debug === 'true',
         verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '2.1.2',
+        version: '3.0.0',
         contactEmail: 'mhw.calc.dev@gmail.com',
       },
       showSaveSection: false,
@@ -272,6 +272,7 @@ export default {
   border-radius: 3px;
   border: 1px solid #d6d4d4;
   width: 80px;
+  background-color: white;
 }
 
 .button {
@@ -398,5 +399,76 @@ export default {
   color: #777777;
   font-style: italic;
   text-align: right;
+}
+
+@media screen and (max-width: 1000px) {
+  .mh-calc {
+    height: 100%;
+    display: block;
+    margin-top: 49px;
+    margin-bottom: 58px;
+  }
+
+  .body-section {
+    flex: unset;
+    width: 100%;
+  }
+
+  .header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+
+  .header-info {
+    padding: 12px 16px;
+  }
+
+  .header-icon {
+    padding: 0 16px;
+  }
+
+  .header-title {
+    font-size: 15px;
+    line-height: 25px;
+  }
+
+  .body-content {
+    height: auto;
+  }
+
+  .left-sidebar {
+    background-color: white;
+    float: none;
+    width: 100%;
+    padding: 20px 16px;
+  }
+
+  .left-sidebar .vue-select-input {
+    border: 1px solid #d6d4d4;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .skill-item-control {
+    margin: 20px 16px;
+  }
+
+  .skill-item-header {
+    display: block;
+  }
+
+  .skill-item-selector.vue-selector {
+    margin: auto;
+    margin-top: 8px;
+  }
+
+  .skill-item-display {
+    width: 100%;
+    margin: 6px 0;
+  }
 }
 </style>

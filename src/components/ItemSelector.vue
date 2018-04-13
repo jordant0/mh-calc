@@ -52,14 +52,11 @@ export default {
 <template>
   <div class='skill-item-selector'>
     <div class='skill-item-input input-item select-wrapper'>
-      <span class='skill-item-label input-label'>
-        Add item/buff
-      </span>
-
       <selector
         class='skill-item-selector'
         :value.sync='selected'
         :options='filteredList'
+        placeholder='Add item/buff'
       />
     </div>
   </div>

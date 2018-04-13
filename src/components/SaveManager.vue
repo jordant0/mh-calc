@@ -305,4 +305,19 @@ export default {
 .import-wrapper:hover .button, .saves-import:hover .button {
   background-color: #cccccc;
 }
+
+@media screen and (max-width: 1000px) {
+  .save-area {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    z-index: 10;
+  }
+
+  .save-manager {
+    height: 100%;
+    padding-bottom: 78px;
+  }
+}
 </style>

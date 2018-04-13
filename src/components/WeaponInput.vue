@@ -496,4 +496,10 @@ export default {
   background-color: #523067;
   border-color: #8453a2;
 }
+
+@media screen and (max-width: 1000px) {
+  .weapon-info .input-field {
+    border: 1px solid #d6d4d4;
+  }
+}
 </style>
