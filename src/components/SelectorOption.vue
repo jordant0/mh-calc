@@ -12,10 +12,16 @@ export default {
     optionValue: [Number, String],
     optionData: Object,
     selected: String,
+    highlighted: [Number, String],
+    index: Number,
   },
 
 
   computed: {
+    isHighlighted() {
+      return this.highlighted === this.optionValue;
+    },
+
     optionClass() {
       var classNames = ['vue-select-option_link', 'vue-select-display'];
       if(this.optionData.className) {
@@ -23,6 +29,10 @@ export default {
       }
       else {
         classNames.push(this.toClassName(this.optionData.name));
+      }
+
+      if(this.isHighlighted) {
+        classNames.push('highlighted');
       }
 
       if(this.selected === this.optionValue.toString()) {
@@ -35,6 +45,10 @@ export default {
   methods: {
     selectOption(value) {
       this.$emit('select-option', value)
+    },
+
+    mouseEnter() {
+      this.$emit('option-hover', this.index);
     }
   },
 }
@@ -42,7 +56,13 @@ export default {
 
 <template>
   <li class='vue-select-option'>
-    <a :class='optionClass' href='#' @mousedown.prevent @click.prevent.stop='selectOption(optionValue)'>
+    <a
+      :class='optionClass'
+      href='#'
+      @mousedown.prevent
+      @click.prevent.stop='selectOption(optionValue)'
+      @mouseover='mouseEnter'
+    >
       {{ optionData.name }}
     </a>
   </li>
@@ -54,7 +74,7 @@ export default {
   display: block;
 }
 
-.vue-select-option:hover {
+.vue-select-option_link.highlighted  {
   background-color: #eeeeee;
 }
 
@@ -62,7 +82,9 @@ export default {
   z-index: 52px;
 }
 
-.vue-select-option_link, .vue-select-option_link:hover, .vue-select-option_link:focus {
+.vue-select-option_link,
+.vue-select-option_link:hover,
+.vue-select-option_link:focus {
   color: #2c3e50;
   text-decoration: none;
 }
@@ -72,7 +94,11 @@ export default {
   font-weight: 600;
 }
 
-.vue-select-option--selected:hover {
+.vue-select-option--selected.highlighted {
   background-color: #cce8f5;
+}
+
+.mouse-over {
+  color: red;
 }
 </style>

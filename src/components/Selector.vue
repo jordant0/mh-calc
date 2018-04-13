@@ -34,12 +34,34 @@ export default {
       query: '',
       showDropdown: false,
       inputValue: '',
+      highlighted: null,
     }
   },
 
   watch: {
     value() {
-      this.resetInputValue()
+      this.resetInputValue();
+    },
+
+    filteredOptions() {
+      this.resetHighlighted();
+    },
+
+    highlighted() {
+      var optionHeight = this.$refs.selectInput.offsetHeight,
+          highlightedTop = optionHeight * this.highlighted,
+          highlightedBottom = highlightedTop + optionHeight,
+          dropdownHeight = this.$refs.selectDropdown.offsetHeight,
+          scrollTop = this.$refs.selectDropdown.scrollTop,
+          scrollBottom = scrollTop + dropdownHeight;
+
+      if(highlightedTop < scrollTop) {
+        this.$refs.selectDropdown.scrollTop = highlightedTop;
+      }
+
+      if(highlightedBottom > scrollBottom) {
+        this.$refs.selectDropdown.scrollTop = highlightedBottom - dropdownHeight;
+      }
     },
   },
 
@@ -125,6 +147,13 @@ export default {
       }
       return names;
     },
+
+    highlightedValue() {
+      if(!this.highlighted && this.highlighted !== 0) {
+        return null;
+      }
+      return Object.keys(this.filteredOptions)[this.highlighted];
+    }
   },
 
   methods: {
@@ -144,6 +173,10 @@ export default {
       this.$refs.selectInput.blur();
     },
 
+    selectHighlighted(value) {
+      this.selectOption(this.highlightedValue);
+    },
+
     clearQuery() {
       this.query = '';
       this.inputValue = '';
@@ -155,12 +188,39 @@ export default {
 
     openDropdown() {
       this.showDropdown = true;
+      this.resetHighlighted();
       this.clearQuery();
     },
 
     closeDropdown() {
       this.showDropdown = false;
       this.resetInputValue();
+    },
+
+    resetHighlighted() {
+      this.highlighted = null;
+    },
+
+    highlightUp() {
+      if(this.highlighted || this.highlighted === 0) {
+        this.highlighted = Math.max(this.highlighted - 1, 0);
+      }
+      else {
+        this.highlighted = 0;
+      }
+    },
+
+    highlightDown() {
+      if(this.highlighted || this.highlighted === 0) {
+        this.highlighted = Math.min(this.highlighted + 1, Object.keys(this.filteredOptions).length - 1);
+      }
+      else {
+        this.highlighted = 0;
+      }
+    },
+
+    changeHighlight(index) {
+      this.highlighted = index;
     },
   },
 }
@@ -179,6 +239,9 @@ export default {
         :placeholder='placeholder'
         @focus='openDropdown'
         @blur='closeDropdown'
+        @keydown.up='highlightUp'
+        @keydown.down='highlightDown'
+        @keydown.enter='selectHighlighted'
         ref='selectInput'
       />
 
@@ -187,14 +250,21 @@ export default {
       </span>
     </div>
 
-    <ul :class='dropDownClass' :style='{ maxHeight: maxHeight }'>
+    <ul
+      :class='dropDownClass'
+      :style='{ maxHeight: maxHeight }'
+      ref='selectDropdown'
+    >
       <selector-option
-        v-for='(optionData, optionValue) in filteredOptions'
+        v-for='(optionData, optionValue, index) in filteredOptions'
         :option-value='optionValue'
         :option-data='optionData'
         :selected='selected'
         :key='optionValue'
+        :highlighted='highlightedValue'
+        :index='index'
         @select-option='selectOption'
+        @option-hover='changeHighlight'
       />
       <li v-if='noOptionFound' class='vue-select_no-result'>
         No result found
