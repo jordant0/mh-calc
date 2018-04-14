@@ -256,6 +256,14 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+}
+
+.save-top-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .save-actions {
@@ -269,7 +277,7 @@ export default {
 
 .saves-display {
   margin: 20px 0;
-  max-height: calc(100vh - 160px);
+  flex: 1;
   overflow: auto;
 }
 
@@ -318,10 +326,6 @@ export default {
   .save-manager {
     height: 100%;
     padding-bottom: 78px;
-  }
-
-  .saves-display {
-    max-height: calc(100vh - 218px);
   }
 }
 </style>
