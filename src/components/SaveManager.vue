@@ -319,5 +319,9 @@ export default {
     height: 100%;
     padding-bottom: 78px;
   }
+
+  .saves-display {
+    max-height: calc(100vh - 218px);
+  }
 }
 </style>

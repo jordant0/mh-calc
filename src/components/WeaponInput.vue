@@ -500,6 +500,10 @@ export default {
 }
 
 @media screen and (max-width: 1000px) {
+  .weapon-info {
+    border-bottom: 1px solid #d6d4d4;
+  }
+
   .weapon-info .input-field {
     border: 1px solid #d6d4d4;
   }
