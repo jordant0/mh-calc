@@ -1,6 +1,7 @@
 <script>
 import Selector from '@/components/Selector'
 import WeaponTypeData from '@/mixins/WeaponTypeData'
+import RoundToDecimal from '@/mixins/RoundToDecimal'
 import { Weapons } from '@/data/Weapons'
 import { Sharpness } from '@/data/Sharpness'
 import { Coatings } from '@/data/Coatings'
@@ -10,7 +11,8 @@ export default {
   name: 'WeaponInput',
 
   mixins: [
-    WeaponTypeData
+    WeaponTypeData,
+    RoundToDecimal,
   ],
 
   components: {
@@ -27,12 +29,19 @@ export default {
       sharpnessList: Sharpness,
       coatingList: Coatings,
       augmentList: Augments,
+      showTrueRaw: true,
+      displayRaw: 0,
     }
+  },
+
+  created() {
+    this.updateDisplayRaw();
   },
 
   watch: {
     'weapon.type': function() {
       this.weapon.id = 0;
+      this.updateDisplayRaw();
     },
 
     'weapon.id': function() {
@@ -63,6 +72,18 @@ export default {
           this.weapon.augmentSlots = 0;
         }
         this.weapon.activation = 100;
+      }
+    },
+
+    'weapon.raw': function() {
+      if(this.showTrueRaw || this.weapon.id !== 0) {
+        this.updateDisplayRaw();
+      }
+    },
+
+    displayRaw: function() {
+      if(!this.showTrueRaw && this.weapon.id === 0) {
+        this.updateTrueRaw()
       }
     },
   },
@@ -115,11 +136,23 @@ export default {
 
       return result;
     },
+
+    bloatValue() {
+      return this.typeInfo.bloatValue;
+    }
   },
 
   methods: {
     flipSign() {
       this.weapon.affinity = -this.weapon.affinity;
+    },
+
+    updateDisplayRaw() {
+      this.displayRaw = this.roundToDecimal(this.weapon.raw * this.bloatValue, 0);
+    },
+
+    updateTrueRaw() {
+      this.weapon.raw = this.roundToDecimal(this.displayRaw / this.bloatValue, 0);
     },
   }
 }
@@ -147,9 +180,45 @@ export default {
       />
 
       <div class='input-item'>
-        <span class='input-label'>Raw</span>
-        <input v-if='weapon.id === 0' class='input-field' type='number' v-model.number='weapon.raw' />
-        <span v-if='weapon.id !== 0' class='input-field text-display'>{{ weapon.raw }}</span>
+        <div class='weapon-input_raw-selector'>
+          <input
+            v-if='weapon.id === 0'
+            type='radio'
+            class='weapon-input_raw-radio'
+            :value='false'
+            v-model='showTrueRaw'
+          >
+          <span class='input-label'>Display Raw</span>
+        </div>
+
+        <input
+          v-if='weapon.id === 0 && !showTrueRaw'
+          class='input-field'
+          type='number'
+          v-model.number='displayRaw'
+        />
+        <span v-else class='input-field text-display'>{{ displayRaw }}</span>
+      </div>
+
+      <div class='input-item'>
+        <div class='weapon-input_raw-selector'>
+          <input
+            v-if='weapon.id === 0'
+            type='radio'
+            class='weapon-input_raw-radio'
+            :value='true'
+            v-model='showTrueRaw'
+          >
+          <span class='input-label'>True Raw</span>
+        </div>
+
+        <input
+          v-if='weapon.id === 0 && showTrueRaw'
+          class='input-field'
+          type='number'
+          v-model.number='weapon.raw'
+        />
+        <span v-else class='input-field text-display'>{{ weapon.raw }}</span>
       </div>
 
       <div class='input-item'>
@@ -497,6 +566,10 @@ export default {
 .augment-selector .vue-select_input-wrapper.vue-select-display.affinity .vue-select-input {
   background-color: #523067;
   border-color: #8453a2;
+}
+
+.weapon-input_raw-radio {
+  padding-right: 10px;
 }
 
 @media screen and (max-width: 1000px) {
