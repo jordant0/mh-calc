@@ -22,6 +22,10 @@ export default {
       return [...Array(this.skillData.levels.length).keys()].map(i => i+1);
     },
 
+    skillColor() {
+      return this.skillData.color;
+    },
+
     enableActivationEdit() {
       return !this.skillData.fixedActivation;
     },
@@ -65,7 +69,7 @@ export default {
 <template>
   <div :class='displayClass'>
     <div class='skill-header'>
-      <div class='skill-item-name'>
+      <div :class='["skill-item-name skill-with-icon", skillColor]'>
         {{ skillName }}
       </div>
 
@@ -131,6 +135,42 @@ export default {
   font-style: italic;
   font-size: 14px;
   color: #d80000;
+}
+
+.skill-with-icon {
+  position: relative;
+  padding-left: 32px;
+}
+
+.skill-with-icon:before {
+  content: '';
+  height: 25px;
+  width: 25px;
+  left: 0;
+  position: absolute;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  background-image: url('./../assets/skills/white.png');
+}
+
+.skill-with-icon.red:before {
+  background-image: url('./../assets/skills/red.png');
+}
+
+.skill-with-icon.purple:before {
+  background-image: url('./../assets/skills/purple.png');
+}
+
+.skill-with-icon.yellow:before {
+  background-image: url('./../assets/skills/yellow.png');
+}
+
+.skill-with-icon.blue:before {
+  background-image: url('./../assets/skills/blue.png');
+}
+
+.skill-with-icon.green:before {
+  background-image: url('./../assets/skills/green.png');
 }
 
 @media screen and (max-width: 1000px) {

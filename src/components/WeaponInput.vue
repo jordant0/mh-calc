@@ -568,8 +568,14 @@ export default {
   border-color: #8453a2;
 }
 
-.weapon-input_raw-radio {
-  padding-right: 10px;
+.weapon-input_raw-selector {
+  display: flex;
+  align-items: center;
+}
+
+input.weapon-input_raw-radio[type=radio] {
+  margin-right: 7px;
+  margin-top: 0;
 }
 
 @media screen and (max-width: 1000px) {

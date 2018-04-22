@@ -3,7 +3,8 @@ export const SkillList = {
     name: 'Critical Boost',
     defaultActiviation: 100,
     fixedActivation: true,
-    levels: [1, 2, 3], // Dummy values
+    levels: [1, 2, 3], // Dummy values,
+    color: 'purple',
   },
   1: {
     name: 'Weakness Exploit',
@@ -19,6 +20,7 @@ export const SkillList = {
         affinityModifier: .50,
       },
     ],
+    color: 'purple',
   },
   2: {
     name: 'Maximum Might',
@@ -33,7 +35,8 @@ export const SkillList = {
       {
         affinityModifier: .30,
       },
-    ]
+    ],
+    color: 'red',
   },
   3: {
     name: 'Attack Boost',
@@ -65,7 +68,8 @@ export const SkillList = {
         rawModifier: 21,
         affinityModifier: 0.05,
       },
-    ]
+    ],
+    color: 'red',
   },
   4: {
     name: 'Critical Eye',
@@ -93,7 +97,8 @@ export const SkillList = {
       {
         affinityModifier: 0.30,
       },
-    ]
+    ],
+    color: 'purple',
   },
   5: {
     name: 'Agitator',
@@ -119,7 +124,8 @@ export const SkillList = {
         rawModifier: 20,
         affinityModifier: 0.15,
       },
-    ]
+    ],
+    color: 'red',
   },
   6: {
     name: 'Peak Performance',
@@ -134,7 +140,8 @@ export const SkillList = {
       {
         rawModifier: 15,
       },
-    ]
+    ],
+    color: 'red',
   },
   7: {
     name: 'Critical Draw',
@@ -149,7 +156,8 @@ export const SkillList = {
       {
         affinityModifier: 1,
       },
-    ]
+    ],
+    color: 'purple',
   },
   8: {
     name: 'Airborne',
@@ -158,7 +166,8 @@ export const SkillList = {
       {
         affinityModifier: .10,
       },
-    ]
+    ],
+    color: 'blue',
   },
   9: {
     name: 'Latent Power',
@@ -179,7 +188,8 @@ export const SkillList = {
       {
         affinityModifier: .50,
       },
-    ]
+    ],
+    color: 'red',
   },
   10: {
     name: 'Resentment',
@@ -200,7 +210,8 @@ export const SkillList = {
       {
         rawModifier: 25,
       },
-    ]
+    ],
+    color: 'red',
   },
   11: {
     name: 'Non-elemental Boost',
@@ -211,6 +222,7 @@ export const SkillList = {
         rawBoost: .10,
       },
     ],
+    color: 'yellow',
   },
   12: {
     name: 'Heroics',
@@ -232,6 +244,7 @@ export const SkillList = {
         rawBoost: .30,
       },
     ],
+    color: 'red',
   },
   13: {
     name: 'Affinity Sliding',
@@ -241,5 +254,16 @@ export const SkillList = {
         affinityModifier: .30,
       },
     ],
+    color: 'red',
+  },
+  14: {
+    name: 'Fortify',
+    defaultActiviation: 50,
+    levels: [
+      {
+        rawBoost: .10,
+      },
+    ],
+    color: 'red',
   },
 }
