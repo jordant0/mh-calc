@@ -233,4 +233,13 @@ export const SkillList = {
       },
     ],
   },
+  13: {
+    name: 'Affinity Sliding',
+    defaultActiviation: 5,
+    levels: [
+      {
+        affinityModifier: .30,
+      },
+    ],
+  },
 }

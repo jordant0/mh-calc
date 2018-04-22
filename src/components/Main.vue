@@ -83,7 +83,7 @@ export default {
         debug: this.$route.query.debug === 'true',
         verbose:  this.$route.query.verbose === 'true',
         precision: 2,
-        version: '3.1.0',
+        version: '3.1.1',
         contactEmail: 'mhw.calc.dev@gmail.com',
       },
       showSaveSection: false,
